@@ -1,6 +1,6 @@
 /*
 * @Name: MPOT_ChangeRecReqController
-* @Description: Controller Class for Change Record Request by NRO
+* @Description: Controller Class for Changem           Record Request by NRO
 * @Author:Deloitte Consulting
 */
 public with sharing class MPOT_ChangeRecReqController{
