@@ -1,12 +1,12 @@
 /*
 * @Name: MPOT_MilestoneController
-* @Description: Controller Class for Milestone creation
+* @Description: Controller Clas  s for Milestone creation
 * @Author:Deloitte Consulting
 */
 public with sharing class MPOT_MilestoneController{
  
     public boolean modify{get;set;}
-    public string sMSId {get;set;}
+    public string sMSId  {get;set;}
     public string sPjectId {get;set;}
     public List<SelectOption> milestoneList {get;set;}
     public List<SelectOption> SubmilestoneList {get;set;}
