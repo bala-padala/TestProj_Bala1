@@ -1,0 +1,684 @@
+<apex:page id="view" standardController="GLBL_Project__c" extensions="MPOT_ViewProjectController" sidebar="false" standardStylesheets="false">
+    <!--CSS-->
+    <apex:stylesheet value="{!URLFOR($Resource.MPOT_Resource,'/css/chosen.min.css')}"/>
+    <apex:stylesheet value="{!URLFOR($Resource.MPOT_Resource,'/css/bootstrap.min.css')}"/>
+    <!--SCRIPTS-->
+    <script src="/soap/ajax/33.0/connection.js" type="text/javascript"></script>
+    <script src="/soap/ajax/33.0/apex.js" type="text/javascript"></script>
+    <apex:includeScript value="{!URLFOR($Resource.MPOT_Resource,'/js/jquery-2.1.4.min.js')}"/>
+    <apex:stylesheet value="{!URLFOR($Resource.MPOT_Resource,'/css/chosen.min.css')}"/>
+    <apex:stylesheet value="{!URLFOR($Resource.MPOT_Resource,'/css/bootstrap.min.css')}"/>
+    <apex:stylesheet value="{!URLFOR($Resource.MPOT_Resource,'/css/MPO_styles.css')}"/>
+    <apex:stylesheet value="{!URLFOR($Resource.MPOT_Resource,'/css/MPO_ipad_styles.css')}"/>
+    <apex:stylesheet value="{!URLFOR($Resource.MPOT_Resource,'/css/MPO_common.css')}"/>
+    <script>
+        $(document).ready(function(){
+             sforce.connection.sessionId = '{!$Api.Session_ID}';
+                  var uId = '{!$User.Id}';
+                  //var qr = sforce.connection.query("SELECT PermissionSet.Name FROM PermissionSetAssignment WHERE AssigneeId = \'"+uId+"\'");
+                  var flag = 'not found';
+                  //var it = new sforce.QueryResultIterator(qr);
+                  var resultMessage = sforce.apex.execute("MPOT_Landing","perSet",{});
+                   // while(it.hasNext()){
+                   //     var record = it.next();
+                   //     if(record.PermissionSet.Name == 'MPOT_Full_Active' || record.PermissionSet.Name == 'MPOT_General_Plus' ){
+                   //         flag = 'found';
+                   //     }
+                   // }
+                  
+                  //Adding ipad detection 
+                if(navigator.userAgent.match(/iPad/i) != null){    
+                    $('body').addClass('ipad');
+                }
+                   
+                   if(resultMessage  == 'false'){
+                      if( /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent)  ){
+                               var p3 = document.getElementById('{!$Component.view:error:p5}'); 
+                               if(p3 != null){
+                                p3.style.visibility= "visible"; 
+                              }
+                              
+                                var p4 = document.getElementById('{!$Component.view:error:p6}'); 
+                       
+                               if(p4 != null){
+                                p4.style.visibility= "visible"; 
+                              }
+                                 var pr = document.getElementById('header-color1'); 
+                       
+                               if(pr != null){
+                                pr.style.visibility= "hidden"; 
+                              }
+                                var pblk = document.getElementById('view:form1:pblock'); 
+                       
+                               if(pblk != null){
+                                pblk .style.visibility= "hidden"; 
+                              }
+                             
+                        }
+                    }else if(resultMessage  == 'true'){
+                          if( /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent)  ){
+                           
+                               var p5 = document.getElementById('rc'); 
+                        
+                               if(p5 != null){
+                                p5.style.display = "none"; 
+                              }
+                              
+                              
+                               var p6 = document.getElementById('rc3'); 
+                   
+                               if(p6 != null){
+                                p6.style.display = "none"; 
+                              }
+                              
+                              
+                               var p7 = document.getElementById('{!$Component.rc2}'); 
+                   
+                               if(p7 != null){
+                                p7.style.display = "none"; 
+                              }
+                           }
+                    }
+                   
+             }); 
+             
+             function statusValidation(input){
+                 if(input.value == 'No Significant Issues'){
+                    document.getElementById('view:radio:pb:pbs:changesIssues').value = 'No issues/changes.';
+                 }
+                 else{
+                        document.getElementById('view:radio:pb:pbs:changesIssues').value = '';
+                 }
+             }   
+             
+            
+                  
+    </script>
+    <style type="text/css">
+        //Very generic style 
+        table.list td.dataCell{
+            word-wrap: break-word !important;
+        }
+        .popup
+        {
+            background-color: white;
+            border-width: 2px;
+            border-style: solid;
+            z-index: 9999;
+            left: 50%;
+            padding:10px;
+            position: absolute;
+            width: 450px;
+            margin-left: -250px;
+            top:100px;
+        }
+        .popup1
+        {
+            background-color: white;
+            border-width: 2px;
+            border-style: solid;
+            z-index: 9999;
+            left: 50%;
+            padding:10px;
+            position: absolute;
+            width: 450px;
+            margin-left: -250px;
+            bottom:160px;
+        }
+        .popup2
+        {
+            background-color: white;
+            border-width: 2px;
+            border-style: none;
+            z-index: 9999;
+            left: 50%;
+            padding:10px;
+            position: absolute;
+            width: 960px;
+            height:2000px;
+            left: 26%;
+            margin-left: -250px;
+            top:80px;
+            visibility: hidden;
+        }
+        .popupBg
+        {
+            background-color:black;
+            opacity: 0.0;
+            filter: alpha(opacity = 70);
+            position: absolute;
+            width: 100%;
+            height: 100%;
+            top: 0;
+            left: 0;
+            z-index: 9998;
+        }
+        .popupBg1
+        {
+            background-color:black;
+            opacity: 0.20;
+            filter: alpha(opacity = 70);
+            position: absolute;
+            width: 100%;
+            height: 100%;
+            top: 0;
+            left: 0;
+            z-index: 9998;
+        }
+        .sfdcspan2 span
+        {
+            margin-left: -15px;
+        }
+        .popupBg2
+        {
+            background-color:black;
+            opacity: 0.00;
+            filter: alpha(opacity = 70);
+            position: absolute;
+            width: 100%;
+            height: 100%;
+            top: 25%;
+            left: 0;
+            z-index: 9998;
+            visibility: hidden;
+        }
+        .conditional-hideLinks .actionColumn{
+            display:{!if(oProject.MPOT_New_Project_Request_Approved__c && NOT(bIsAdmin),"none","table-cell")};
+        }
+        .conditional-hideLinksMilestone .actionColumn{
+            display:none;
+        }
+        a.linkAsBtn,a.linkAsBtn:hover {
+            text-decoration: none;
+            padding: 3px 6px;
+        }
+        .ipad ::-webkit-scrollbar {
+            width: 12px;
+        }
+        .ipad ::-webkit-scrollbar-track {
+            -webkit-box-shadow: inset 0 0 6px rgba(0,0,0,0.3); 
+            border-radius: 10px;
+        }
+        .ipad ::-webkit-scrollbar-thumb {
+            border-radius: 10px;
+            -webkit-box-shadow: inset 0 0 6px rgba(0,0,0,0.5); 
+        }
+    </style>
+    <apex:form id="form1">
+        <apex:outputPanel id="p3" styleClass="popupBg2" layout="block" />
+        <apex:outputPanel id="p4" styleClass="popup2" layout="block" >
+            <br></br><br></br>
+            <div align ="center"> <b>You do not have access to project records via the Lilly IPAD. If you want to access MPO project records, please log into MPO via Lilly Laptop or Desktop.</b>
+            </div>
+        </apex:outputPanel>
+        <apex:pageBlock id="pblock">
+            <apex:outputPanel rendered="{!bIsNRO}">
+                <div align = "left">
+                    <b>NRO Record Information</b>
+                </div>
+            </apex:outputpanel>
+            <apex:outputPanel rendered="{!bIsAdmin}">
+                <div align = "left">
+                    <b>Admin - NRO New Record Request Preview</b>
+                </div>
+            </apex:outputpanel>
+            <apex:outputPanel rendered="{!(!bIsPO && !bIsReadOnly)}">
+                <div align = "right">
+                    New Record Request Submitted
+                    <apex:outputField label="New Record Request Submitted" value="{!oProject.MPOT_NRO_New_Record_Request_Indicator__c}"/>
+                    <br/>
+                    New Project Request Approved
+                    <apex:outputField label="New Project Request Approved" value="{!oProject.MPOT_New_Project_Request_Approved__c}"/>
+                </div>
+            </apex:outputPanel>
+            <div align = "center">
+                <apex:Messages id="msg" style="color:Red;font-weight:bold;" rendered="{!!popup}"></apex:Messages>
+            </div>
+            <apex:outputPanel id="PageButtons">
+                <div align = "center">
+                    <apex:commandButton value="Submit New Record Request" action="{!submitProject}" rendered="{!(bIsNRO && bIsOwner && oProject.MPOT_NRO_New_Record_Request_Indicator__c == false)}" styleClass="mpo-button"/>
+                    <apex:commandButton value="Approve New Record Request" action="{!approveProject}" rendered="{!(oProject.MPOT_NRO_New_Record_Request_Indicator__c == true && oProject.MPOT_New_Project_Request_Approved__c == false && bIsAdmin)}" styleClass="mpo-button"/>
+                    <apex:commandButton value="Edit New Record Request" action="{!editProject}" rendered="{!((bIsNRO && bIsOwner && NOT(oProject.MPOT_New_Project_Request_Approved__c)) || bIsAdmin) }" styleClass="mpo-button"/>
+                    <apex:commandButton value="Cancel New Record Request" onclick="return confirm('Are you sure you want to delete Project?');" action="{!cancelProject}" rendered="{!bIsNRO && bIsOwner && NOT(oProject.MPOT_New_Project_Request_Approved__c)}" styleClass="mpo-button"/>
+                    <apex:commandButton value="Change Record Request" action="{!changeRecReq}" rendered="{!(bIsNRO && bIsOwner && (oProject.MPOT_New_Project_Request_Approved__c == true) && (oProject.MPOT_NRO_CR_Created_Indicator__c != true) )}" styleClass="mpo-button"/>
+                    <apex:commandButton value="View CR Request" action="{!viewCRReq}" rendered="{!((bIsNRO && (oProject.MPOT_NRO_CR_Created_Indicator__c == true || oProject.MPOT_NRO_Change_Record_Request_Indicator__c == true ) && (oProject.MPOT_NRO_CR_Approved_Indicator__c != true)) || (bIsAdmin && (oProject.MPOT_NRO_Change_Record_Request_Indicator__c == true ) && (oProject.MPOT_NRO_CR_Approved_Indicator__c != true)))}" styleClass="mpo-button" />
+                    <!--
+                        <apex:commandLink value="View Gantt Chart" action="{!RedirectToGantt}"  target="_blank"  styleClass="btn mpo-button linkAsBtn"  rendered="{!(bIsReadOnly && NOT(bIsOnlyPO))}" />
+                        <apex:CommandButton value="Monthly Update" action="{!showPopUP}" rerender="popup" rendered="{!bIsPO}" styleClass="mpo-button"/>-->
+                </div>
+            </apex:outputPanel>
+            <br/>
+            <div id="header-color1" class="col-md-12 col-sm-12" >Basic Details</div>
+            <apex:outputPanel id="basicDetailsSection">
+                <apex:outputPanel >
+                    <div class="col-md-12 col-sm-12">
+                        <div class="col-md-5 col-sm-5">
+                            <b class="mpo-heading">Project Information</b>
+                        </div>
+                        <div class="col-md-2 col-sm-2">
+                            <apex:CommandButton value="Monthly Update" action="{!showPopUP}" rerender="popup" rendered="{!(bIsRltdPrjtOwner && bIsPO)}" styleClass="mpo-button" />
+                        </div>
+                    </div>
+                </apex:outputpanel>
+                <!--<div id="header-color1" class="col-md-12" >Basic Details</div>-->
+                <!--The first row-->
+                <div class="col-md-12 col-sm-12">
+                    <div class="col-md-6 mpo-secheading col-sm-6">
+                        <apex:outputLabel value="Project Name:" styleClass="mpo-secheading"  />
+                        <apex:outputfield label="Project Name" styleClass="mpo-secheading" value="{!oProject.Name}"/>
+                    </div>
+                    <div class="pull-right">
+                        <apex:outputLabel value="Project #:" />
+                        <apex:outputfield label="Project #" value="{!oProject.MPOT_Project_Number__c}"/>
+                    </div>
+                </div>
+                <!--End of first row-->
+                <!--Second Row-->
+                <div class="col-md-12 col-sm-12">
+                    <div class="col-md-6 col-sm-6">
+                        <div class="col-md-12 padLZ col-sm-12">
+                            <apex:outputLabel value="Project Description:" styleClass="mpo-subheading" />
+                        </div>
+                        <div class="col-md-12 padLZ span-height-left col-sm-12">
+                            <apex:outputfield label="Project Description" value="{!oProject.MPOT_Project_Description__c}" styleClass="col-md-12 col-sm-5" />
+                            <!--{!oProject.MPOT_Project_Description__c}-->
+                        </div>
+                    </div>
+                    <div class="col-md-6 col-sm-6">
+                        <div class="col-md-12 padLZ col-sm-12">
+                            <apex:outputLabel value="Project Scope:" styleClass="mpo-subheading" />
+                        </div>
+                        <div class="col-md-12 padLZ span-height-left col-sm-12">
+                            <apex:outputfield label="Project Scope" value="{!oProject.MPOT_Project_Scope__c}" styleClass="col-sm-5"/>
+                        </div>
+                    </div>
+                </div>
+                <!--End of second row-->
+                <!--Start of a row-->
+                <div class="col-md-12 col-sm-12">
+                    <div class="col-md-6 col-sm-6">
+                        <apex:outputLabel value="Project Owner:" />
+                        <apex:outputfield label="Project Owner" value="{!oProject.MPOT_Project_Owner__c}"/>
+                    </div>
+                    <div class="col-md-6 col-sm-6">
+                        <apex:outputLabel value="Regulatory Submission and Approval Required:" />
+                        <apex:outputfield label="Regulatory Submission and Approval Required" value="{!oProject.MPOT_Regulatory_Impact__c}"/>
+                    </div>
+                </div>
+                <!--End of a row-->
+                
+                <div class="col-md-12 col-sm-12">
+                    <div class="col-md-6 col-sm-6">
+                        <apex:outputLabel value="Project Sponsor:" />
+                        <apex:outputfield label="Project Sponsor" value="{!oProject.MPOT_Project_Sponsor__c}"/>
+                    </div>
+                    <div class="col-md-6 col-sm-6">
+                        <apex:outputLabel value="Regulatory Impact Level:" />
+                        <apex:outputfield label="Regulatory Impact Level" value="{!oProject.MPOT_Regulatory_Impact_Level__c}"/>
+                    </div>
+                </div>
+                
+                <!--Start of row-->
+                <div class="col-md-12 col-sm-12">
+                    <div class="col-md-6 col-sm-6">
+                            <apex:outputLabel value="Network Record Owner:" />
+                            <apex:outputfield label="Network Record Owner" value="{!oProject.OwnerId}"/>
+                        
+                        <div class="col-md-12 padLZ col-sm-12">
+                            <apex:outputLabel value="Anchor:" />
+                            <apex:outputfield label="Anchor" value="{!oProject.MPOT_Anchor__c}"/>
+                        </div>
+                        <div class="col-md-12 padLZ col-sm-12">
+                            <apex:outputLabel value="Project Driver:" />
+                            <apex:outputfield label="Project Driver" value="{!oProject.MPOT_Project_Driver__c}"/>
+                        </div>
+                        <div class="col-md-12 padLZ col-sm-12">
+                            <apex:outputLabel value="Stage:" />
+                            <apex:outputfield label="Stage" value="{!oProject.MPOT_Stage__c}"/>
+                        </div>
+                    </div>
+                    <div class="col-md-6 col-sm-6">
+                        <!--Club below 2 fields for status-->
+                        <div class="col-md-4 padRZ col-sm-4 padLZ_iPad">
+                            <div class="col-md-12 padT padRZ col-sm-12 padLZ_iPad displayFlex_iPad">
+                                <div class="col-md-2 img-man col-sm-2 padLZ_iPad">
+                                    <apex:outputfield label="" value="{!oProject.MPOT_Current_Status_Color__c}"/>
+                                </div>
+                                <div class="col-md-9 img-span col-sm-9">
+                                    <apex:outputfield label="" value="{!oProject.MPOT_Current_Status__c}"/>
+                                </div>
+                            </div>
+                        </div>
+                        <apex:outputPanel rendered="{!bApproved}">
+                            <div class="col-md-8 padLZ col-sm-8">
+                                <div class="col-md-12 padLZ col-sm-12">
+                                    <apex:outputLabel value="Monthly Update: Issues/Changes" />
+                                </div>
+                                <div class="col-md-12 span-height-right padLZ col-sm-12">
+                                    <apex:outputfield label="Monthly Update: Issues/Changes" value="{!oProject.MPOT_Changes_Issues__c}"/>
+                                </div>
+                            </div>
+                        </apex:outputPanel>
+                    </div>
+                </div>
+                <!--End of row-->
+                <!--Start of row-->
+                <!--End of row-->
+                <!--Start of row-->
+                <!--End of row-->
+                <apex:outputPanel rendered="{!bApproved}">
+                    <div class="col-md-12 padding-adjst col-sm-12">
+                        <apex:outputLabel value="Overdue:" rendered="{!(!bIsPO && !bIsNRO && !bIsReadOnly)}"/>
+                        <apex:outputfield label="Overdue" value="{!oProject.MPOT_Overdue__c}" rendered="{!(!bIsPO && !bIsNRO && !bIsReadOnly)}"/>
+                    </div>
+                </apex:outputPanel>
+                <div class="col-md-12 col-sm-12">
+                    <apex:outputPanel rendered="{!bApproved}">
+                        <div class="col-md-6 col-sm-6">
+                            <apex:outputLabel value="Date Moved To Inactive Status:" rendered="{!(!bIsPO && !bIsReadOnly)}"/>
+                            <apex:outputfield label="Date Moved To Inactive Status" value="{!oProject.MPOT_Date_Moved_To_Inactive_Status__c}" rendered="{!(!bIsPO && !bIsReadOnly)}"/>
+                        </div>
+                    </apex:outputPanel>
+                    <div class="col-md-6 col-sm-6">
+                        <apex:outputLabel value="Gating Slide Exception:" rendered="{!(!bIsPO && !bIsReadOnly)}"/>
+                        <apex:outputfield label="Gating Slide Exception" value="{!oProject.MPOT_Gating_Slide_Exception__c}" rendered="{!(!bIsPO && !bIsReadOnly)}"/>
+                    </div>
+                </div>
+            </apex:outputPanel>
+            <apex:outputPanel id="CAISection">
+                <div id="header-color1" class="col-md-12 col-sm-12" >Cross Area Impacts</div>
+                <!--One Row-->
+                <div class="col-md-12 col-sm-12">
+                    <div class="col-md-2 col-sm-2" >
+                        <!--start of first div-->
+                        <div class="col-md-12 col-sm-12" >
+                            <apex:outputLabel value="Network Initiating" />
+                        </div>
+                        <div class="col-md-12 short-span col-sm-12">
+                            <apex:outputfield label="Network Initiating" value="{!oProject.MPOT_Network_Project_Initiated_from__c}"/>
+                        </div>
+                    </div>
+                    <!--end of first div-->
+                    <div class="col-md-2 col-sm-2" style="margin-left: -10px;">
+                        <div class="col-md-12 padRZ col-sm-12" style="margin-left:-15px;">
+                            <apex:outputLabel value="Networks Impacted" />
+                        </div>
+                        <div class="col-md-12 sfdc-span sfdcspan2 col-sm-12" style="overflow-wrap: break-word;" >
+                            <apex:outputfield label="Networks Impacted" value="{!oProject.MPOT_Networks_Project_Impacts__c}"/>
+                        </div>
+                    </div>
+                    <!--end of sec div-->
+                    <div class="col-md-2 col-sm-2" style="padding:0px;width:20%;margin-left: 15px;">
+                        <!--start of third div-->
+                        <div class="col-md-12 padRZ col-sm-12" style="padding-left:0px">
+                            <apex:outputLabel style="padding-right:0px" value="Drug Product/Platform Impacted" />
+                        </div>
+                        <div class="col-md-12 sfdc-span sfdcspan2 col-sm-12" style="overflow-wrap: break-word;" >
+                            <apex:outputfield label="Drug Product/Platform Impacted" value="{!oProject.MPOT_Platforms__c}"/>
+                        </div>
+                        <!--end of third div-->
+                    </div>
+                    <div class="col-md-6 col-sm-6" style="width:45%">
+                        <!--start of fourth div-->
+                        <div class="col-md-12 col-sm-12 bottomPadding_iPad">
+                            <apex:outputLabel value="Sites Impacted" />
+                        </div>
+                        <div class="col-md-12 side-span col-sm-12" >
+                            <apex:outputfield label="Sites Impacted" value="{!oProject.MPOT_Sites__c}" />
+                            <!--<span id="sites" ></span>-->
+                        </div>
+                        <div class="col-md-12 col-sm-12">
+                            <apex:outputLabel value="Molecules Impacted" />
+                        </div>
+                        <div class="col-md-12 side-span col-sm-12">
+                            <apex:outputfield label="Molecules Impacted" value="{!oProject.MPOT_Molecule_Name__c}"/>
+                        </div>
+                    </div>
+                    <!--End of fourth div-->
+                </div>
+                <!--End of row-->
+            </apex:outputPanel>
+            <!--this section is not there in the layout-->
+            <apex:outputPanel id="NRONotesSection" rendered="{!(bIsAdmin || bIsNRO)}">
+                <div id="header-color1" class="col-md-12 col-sm-12" >NRO Notes to the Database Administrator</div>
+                <div class="col-md-12 col-sm-12">
+                    <div class="col-md-3 col-sm-3">
+                        <apex:outputLabel value="NRO Comments" />
+                    </div>
+                    <div class="col-md-9 col-sm-9">
+                        <apex:outputfield label="NRO Comments" value="{!oProject.MPOT_NRO_Comments__c}"/>
+                    </div>
+                </div>
+            </apex:outputPanel>
+            <apex:outputPanel id="DBANotesSection" rendered="{!bIsAdmin }">
+                <div id="header-color1" class="col-md-12 col-sm-12" >Database Administrator Notes</div>
+                <div class="col-md-12 col-sm-12">
+                    <div class="col-md-3 col-sm-3">
+                        <apex:outputLabel value="Admin Comments" />
+                    </div>
+                    <div class="col-md-9 col-sm-9">
+                        <apex:outputfield label="Admin Comments" value="{!oProject.MPOT_Administrative_Comments__c}"/>
+                    </div>
+                </div>
+            </apex:outputPanel>
+            <!--end of that scetion-->
+            <apex:actionFunction name="saveTrialContactRoles" action="{!submitProject}" rerender="form1,msg" status="LoadingStatusSpinner" />
+        </apex:pageBlock>
+    </apex:form>
+    <apex:outputPanel id="relatedList1" rendered="{!(bIsPO || bIsReadOnly)}">
+        <!--Gating Slide related list-->
+        <div class="col-md-12 col-sm-12">
+            <div id="header-color1" class="col-md-12 col-sm-12" >Gating Slides and Connection</div>
+        </div>
+        <div class="col-md-12 col-sm-12">
+            <!--Wrapper for gating slide and project connections-->
+            <div class="col-md-6 padLZ col-sm-6">
+                <apex:outputPanel id="gatingSlide">
+                    <!--
+                        <apex:form >
+                        <div align = "center">
+                        <apex:commandButton value="New Project Gating Slide" action="{!newGatingSlide}" rendered="{!((bIsNRO && bIsOwner && NOT(oProject.MPOT_New_Project_Request_Approved__c)) || bIsAdmin)}" styleClass="mpo-button"/>
+                        </div>
+                        </apex:form>-->
+                    <div class="col-md-12 col-sm-12" style="height:50px"></div>
+                    <div class="conditional-hideLinksMilestone">
+                        <apex:relatedList list="Project_Gating_Slide_Files__r" pageSize="50"/>
+                    </div>
+                </apex:outputPanel>
+            </div>
+            <div class="col-md-6 col-sm-6">
+                <!--Project Connections related list-->
+                <apex:outputPanel id="projectConnections">
+                    <apex:form >
+                        <div class="col-md-12 col-sm-12" style="height:50px;padding-left:200px">
+                            <a name="pConnections" />
+                            <apex:commandButton value="Add Connection" action="{!newProjectConnection}" rendered="{!(bIsRltdPrjtOwner && bIsPO)}" styleClass="mpo-button"/>
+                        </div>
+                    </apex:form>
+                    <div class="conditional-hideLinksMilestone">
+                        <apex:relatedList list="Project_Connections__r" pageSize="50"/>
+                    </div>
+                </apex:outputPanel>
+            </div>
+        </div>
+        <!-- of the outer div -->
+    </apex:outputPanel>
+    <apex:outputPanel id="OnlyGatingSlide" rendered="{!(bIsAdmin || bIsNRO)}">
+        <apex:form >
+            <div class="col-md-12 col-sm-12">
+                <div id="header-color1" class="col-md-12 col-sm-12" >Gating Slides</div>
+            </div>
+            <div align = "center" class="col-md-12 col-sm-12">
+                <a name="gSlide" />
+                <apex:commandButton value="New Project Gating Slide" action="{!newGatingSlide}" rendered="{!((bIsNRO && bIsOwner && NOT(oProject.MPOT_New_Project_Request_Approved__c)) || bIsAdmin)}" styleClass="mpo-button"/>
+            </div>
+        </apex:form>
+        <div class="conditional-hideLinksMilestone col-md-12 col-sm-12">
+            <apex:relatedList list="Project_Gating_Slide_Files__r" pageSize="50"/>
+        </div>
+    </apex:outputPanel>
+    <apex:outputPanel rendered="{!(bIsPO || bIsReadOnly)}">
+        <div class="col-md-12 col-sm-12">
+            <div id="header-color1" class="col-md-12 col-sm-12" >Milestones</div>
+        </div>
+        <apex:form id="radio">
+            <apex:outputPanel id="GanttButton" rendered="{!(bIsReadOnly && NOT(bIsOnlyPO))}">
+                <div align = "center" class="col-md-12 col-sm-12">
+                    <apex:commandLink value="View Gantt Chart" action="{!RedirectToGantt}"  target="_blank"  styleClass="btn mpo-button linkAsBtn"  />
+                </div>
+                <br/>
+            </apex:outputPanel>
+            <apex:outputPanel rendered="{!(bIsRltdPrjtOwner && bIsPO)}">
+                <div align = "center" class="col-md-12">
+                    <a name="Milestone" />
+                    <!--<apex:CommandButton value="Monthly Update" action="{!showPopUP}" rerender="popup"/>-->
+                    <apex:CommandButton value="Add Milestone" action="{!newMilestone}" styleClass="mpo-button"/>
+                </div>
+                <br/>
+            </apex:outputPanel>
+            <apex:outputPanel id="popup">
+                <apex:outputPanel id="p1" styleClass="popupBg" layout="block" rendered="{!popup}"/>
+                <apex:outputPanel id="p2" styleClass="popup" layout="block" rendered="{!popup}">
+                    <div align ="center"> <b>Monthly Update</b></div>
+                    <apex:Messages id="msg1" style="color:Red;font-weight:bold;"/>
+                    <apex:pageBlock id="pb">
+                        <apex:pageBlockSection title="Status"  >
+                            <apex:pageblockSectionItem dataStyle="width:70%">
+                                <apex:selectRadio id="Status" value="{!sRadio}" layout="PageDirection" onclick="statusValidation(this)" >
+                                    <apex:selectOptions value="{!statusValues}"   />
+                                </apex:selectRadio>
+                            </apex:pageblockSectionItem>
+                            <apex:pageblockSectionItem dataStyle="float:left">
+                                <!--      <apex:image url="/servlet/servlet.FileDownload?file=01526000000ANjC"/> -->
+                                <apex:image url="{!URLFOR($Resource.MPOT_Resource,'/css/images/Red.jpg')}"/>
+                            </apex:pageblockSectionItem>
+                        </apex:pageBlockSection>
+                        <!-- <apex:outputText value="The Value you selected is{!oProject.MPOT_Current_Status__c}" />--><br/>
+                        <apex:pageBlockSection title="Issues/Changes"  id="pbs">
+                            <apex:outputLabel value="Issues/Changes"></apex:outputLabel>
+                            <apex:inputTextarea id="changesIssues" value="{!sIssues}"  style="width:250px; height:150px"/>
+                        </apex:pageBlockSection>
+                        <!--<apex:outputText value="The Value you selected is{!oProjectTest.MPOT_Changes_Issues__c}" />--><br/>
+                    </apex:pageBlock>
+                    <div align="center">
+                        <apex:commandButton value="Confirm" action="{!confirmMonthlyUpdate}" style="background-color:#00FF00; background-image:none;"/>
+                        <apex:commandButton value="Cancel" action="{!closePopup}" rerender="popup" immediate="true" style="background-color:#FF0000; background-image:none;"/>
+                    </div>
+                </apex:outputPanel>
+            </apex:outputPanel>
+        </apex:form>
+        <div class ="conditional-hideLinksMilestone col-md-12 col-sm-12">
+            <apex:relatedList list="Project_Milestones__r" pageSize="50"/>
+        </div>
+    </apex:outputPanel>
+    <!-- River System Starts-->
+    <apex:outputPanel rendered="{!(bIsPO || bIsReadOnly)}" id="reg">
+        <div id="rc" class="col-md-12 col-sm-12">
+            <div id="header-color1" class="col-md-12 col-sm-12" >Regulatory Connection</div>
+        </div>
+        <apex:form >
+            <apex:outputPanel rendered="{!(bIsRltdPrjtOwner && bIsPO)}">
+                <div id="rc1" align = "center" class="col-md-12 col-sm-12">
+                    <a name="River" />
+                    <p class='topic-header' id='what-class'>
+                        <apex:commandButton value="Regulatory Connection" action="{!showPopUP1}" rerender="popup1" styleClass="mpo-button"/>
+                    </p>
+                </div>
+            </apex:outputPanel>
+            <div id = "rc3" class="col-md-12 col-sm-12">
+                <div class="col-md-6 col-sm-6">
+                    <div class="col-md-12 col-sm-12">
+                        <apex:outputLabel value="Regulatory Umbrella Project Name:" />
+                    </div>
+                    <div class="col-md-12 col-sm-12 span-height-rleft topPadding_iPad">
+                        <apex:outputfield label="Regulatory Umbrella Project Name" value="{!oProject.MPOT_Regulatory_Umbrella_Project_Name__c}"/>
+                    </div>
+                </div>
+                <div class="col-md-6 col-sm-6">
+                    <div class="col-md-12 col-sm-12">
+                        <apex:outputLabel value="RIVER System Link:" />
+                        <apex:outputLabel value="(Regulatory Information,Visualization,Evaluation and Reporting System)" style="font-size:x-small;" />
+                    </div>
+                    <div class="col-md-12 col-sm-12 span-height-rleft">
+                        <apex:outputField label="RIVER System Link" value="{!oProject.MPOT_Link_to_Regulatory_RIVER_System_LT__c}"/>
+                    </div>
+                </div>
+            </div>
+            <!--<apex:outputField label="RIVER System Link" value="{!oProject.MPOT_RIVER__c}"/> -->
+            <apex:outputPanel id="popup1">
+                <apex:outputPanel styleClass="popupBg1" layout="block" rendered="{!popup1}"/>
+                <apex:outputPanel styleClass="popup1" layout="block" rendered="{!popup1}">
+                    <div align ="center"> <b>Regulatory Connection</b></div>
+                    <apex:Messages style="color:Red;font-weight:bold;"/>
+                    <apex:pageBlock >
+                        <apex:pageBlockSection title="Regulatory Umbrella Project Name">
+                            <apex:pageblockSectionItem >
+                                <apex:inputField value="{!oProject.MPOT_Regulatory_Umbrella_Project_Name__c}" style="width:300px;" />
+                            </apex:pageblockSectionItem>
+                        </apex:pageBlockSection>
+                        <apex:pageBlockSection title="RIVER System Link">
+                            <apex:pageblockSectionItem >
+                                <apex:inputField value="{!oProject.MPOT_Link_to_Regulatory_RIVER_System_LT__c}" style="width:300px" />
+                            </apex:pageblockSectionItem>
+                        </apex:pageBlockSection>
+                    </apex:pageBlock>
+                    <div align="center">
+                        <apex:commandButton value="Confirm" action="{!confirmRIVERsystem}" style="background-color:#00FF00; background-image:none;"/>
+                        <apex:commandButton value="Cancel" action="{!closePopup1}" rerender="popup1" style="background-color:#FF0000; background-image:none;"/>
+                    </div>
+                </apex:outputPanel>
+            </apex:outputPanel>
+        </apex:form>
+    </apex:outputPanel>
+    <!-- River System Ends -->
+    <!-- change log starts -->
+    <div class ="ActionColHide" >
+        <apex:outputPanel rendered="{!(bIsAdmin)}">
+            <div class="col-md-12 col-sm-12">
+                <div id="header-color1" class="col-md-12 col-sm-12">Change Logs</div>
+            </div>
+            <div class="col-md-12 col-sm-12">
+                <apex:relatedList title="Project Change Log" list="MPOT_Change_Logs__r" pageSize="50"/>
+            </div>
+        </apex:outputPanel>
+    </div>
+    <style type="text/css">
+        div.ActionColHide .actionColumn{
+        display:none; 
+        visibility:hidden 
+        } 
+    </style>
+    <!-- Change Log ends -->
+    <apex:outputPanel id="lastUpdate" rendered="{!!bIsAdmin}">
+        <div align="left" class="col-md-12 col-sm-12">
+            <div id="header-color1" class="col-md-12 col-sm-12"></div>
+            <div class="col-md-6 col-sm-6" >
+                <apex:outputLabel value="Record Creation Date:" />
+                <apex:outputfield label="Record Creation Date:" value="{!oProject.CreatedDate}"/>
+                <!--</div>
+                    <div align="right" class="col-md-12">-->
+            </div>
+            <div class="pull-right">
+                <apex:outputLabel value="Last Monthly Update:" />
+                <apex:outputfield label="Last Monthly Update:" value="{!oProject.MPOT_Monthly_Update_Date__c}"/>
+            </div>
+        </div>
+        <!--
+            <apex:pageBlock >
+            <apex:pageBlockSection columns="2" title="Project Record Information">
+            <apex:outputfield label="Created By" value="{!oProject.CreatedById}"/>
+            <apex:outputField label="Last Modified by" value="{!oProject.LastModifiedById}"/>
+            <apex:outputfield label="Created Date" value="{!oProject.CreatedDate}"/>
+            <apex:outputField label="Last Modified Date" value="{!oProject.LastModifiedDate}"/>
+            </apex:pageBlockSection>
+             </apex:pageBlock>-->
+    </apex:outputPanel>
+    <apex:form id="error">
+        <apex:outputPanel id="p5" styleClass="popupBg2" layout="block" />
+        <apex:outputPanel id="p6" styleClass="popup2" layout="block" >
+            <br></br><br></br>
+            <div align ="center"> <b>You do not have access to project records via the Lilly IPAD. If you want to access MPO project records, please log into MPO via Lilly Laptop or Desktop.</b>
+            </div>
+        </apex:outputPanel>
+    </apex:form>
+</apex:page>

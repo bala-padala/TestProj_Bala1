@@ -1,0 +1,19 @@
+<apex:component controller="MPOT_MonthlyLog"> 
+
+<style>
+.conditional-hideLinks .x-grid3-td-ACTION_COLUMN, .x-grid3-td-checkbox, .listButtons{
+    display:none;
+    }
+</style>
+ 
+  <apex:attribute name="listViewName" type="String" required="true" 
+    description="The name of the listview." assignTo="{!listName}"/>    
+<apex:outputPanel >
+<div class="conditional-hideLinks">
+  <apex:enhancedList height="400" rowsPerPage="25" id="ChangeLogList"
+    listId="{!listId}" rendered="{!listId != null}" customizable="False" />
+    </div>
+</apex:outputPanel>
+  <apex:outputText rendered="{!listId == null}" value="Could not find requewed ListView: '{!listName}'. Please contact your administrator."/>
+
+</apex:component>

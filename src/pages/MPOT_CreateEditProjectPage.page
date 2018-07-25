@@ -1,0 +1,498 @@
+<apex:page id="create" standardController="GLBL_Project__c" extensions="MPOT_CreateEditProjectController" action="{!redirectOnComplete}" sidebar="false">
+<apex:includeScript value="{!URLFOR($Resource.MPOT_Resource,'/js/jquery-2.1.4.min.js')}"/>
+<apex:includeScript value="{!URLFOR($Resource.MPOT_Resource,'/js/chosen.jquery.min.js')}"/>
+<apex:includeScript value="{!URLFOR($Resource.MPOT_Resource,'/js/jquery.validate.min.js')}"/>
+<apex:includeScript value="{!URLFOR($Resource.MPOT_Resource,'/js/jquery-ui.js')}"/>
+<apex:includeScript value="{!URLFOR($Resource.MPOT_Resource,'/js/bootstrap.min.js')}"/>
+<!--Static resource for MPO-->
+<apex:includeScript value="{!URLFOR($Resource.MPOT_Resource,'/js/MPO_Handler.js')}"/>
+<apex:includeScript value="{!URLFOR($Resource.MPOT_Resource,'/js/MPO_onLoad.js')}"/>
+<apex:includeScript value="{!URLFOR($Resource.MPOT_Resource,'/js/MPO_Molecules.js')}"/>
+<script src="/soap/ajax/33.0/connection.js" type="text/javascript"></script>
+<script src="/soap/ajax/33.0/apex.js" type="text/javascript"></script>
+<!--CSS-->
+<apex:stylesheet value="{!URLFOR($Resource.MPOT_Resource,'/css/chosen.min.css')}"/>
+<apex:stylesheet value="{!URLFOR($Resource.MPOT_Resource,'/css/bootstrap.min.css')}"/>
+
+<apex:stylesheet value="{!URLFOR($Resource.MPOT_Resource,'/css/MPO_styles.css')}"/>
+
+ <script>
+    $(document).ready(function(){
+    
+         sforce.connection.sessionId = '{!$Api.Session_ID}';
+         if( /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent)  ){
+                      
+                           var p3 = document.getElementById('{!$Component.create:error:p5}'); 
+                       
+                           if(p3 != null){
+                            p3.style.visibility= "visible"; 
+                          }
+                          
+                            var p4 = document.getElementById('{!$Component.create:error:p6}'); 
+                   
+                           if(p4 != null){
+                            p4.style.visibility= "visible"; 
+                          }
+                          
+                           var p1 = document.getElementById('hd1'); 
+                       
+                           if(p1 != null){
+                            p1.style.visibility= "hidden"; 
+                          }
+                          
+                            var p2 = document.getElementById('hd2'); 
+                   
+                           if(p2 != null){
+                            p2.style.visibility= "hidden"; 
+                          }
+                          
+                           var p5 = document.getElementById('btn'); 
+                   
+                           if(p5 != null){
+                            p5.style.visibility= "hidden"; 
+                          }
+                            
+                    }
+            
+               
+         });   
+ </script>
+<style type="text/css">
+
+   
+            .popup2
+        {
+            background-color: white;
+            border-width: 2px;
+            border-style: none;
+            z-index: 9999;
+            left: 50%;
+            padding:10px;
+            position: absolute;
+            width: 960px;
+            height:2000px;
+            left: 26%;
+            margin-left: -250px;
+             top:80px;
+            visibility: hidden;
+           
+      
+        }
+   
+      
+
+      .popupBg2
+        {
+            background-color:black;
+            opacity: 0.00;
+            filter: alpha(opacity = 70);
+            position: absolute;
+            width: 100%;
+            height: 100%;
+            top: 25%;
+            left: 0;
+            z-index: 9998;
+            visibility: hidden;
+       
+           
+        }
+  </style>
+
+<apex:form >
+
+
+<apex:outputPanel rendered="{!bIsNRO}">
+<div id="hd1" align = "left">
+<b>NRO New Record Request </b>
+</div>  
+</apex:outputpanel>
+
+<apex:outputPanel rendered="{!bIsAdmin}">
+<div id="hd2" align = "left">
+<b>Admin - NRO New Record Request </b>
+</div>  
+</apex:outputpanel>
+<br/>
+
+<div id="btn" align = "center">
+<!-- <apex:Messages style="color:Red;font-weight:bold;"/> -->
+<apex:commandButton value="Save & Preview New Record Request " action="{!saveProject}" styleClass="mpo-button"/>
+<apex:commandButton value="Cancel New Record Request Updates" action="{!cancelEdit}" immediate="true" styleClass="mpo-button"/>
+</div>
+
+<div id="header-color1" class="col-md-12" >Basic Details</div>
+<!--First Row-->
+
+<div class="col-md-12 first-div">
+
+<!--Encapsulate this in an element and rerender it based on condition  -->
+<apex:outputpanel rendered="{!bIsNRO}">
+
+<div class="col-md-6" >
+<div class="col-md-3" >
+<apex:outputLabel value="Project Name" styleClass="req-label" />
+ <apex:outputLabel value=" (40 Character Limit)" style="font-size:x-small;" />
+</div>
+<div class="col-md-9 padLZ" >
+<apex:inputfield label="Project Name" value="{!oProject.Name}" styleClass="req"  style="width:410px" /><br/>
+
+</div>
+</div>
+</apex:outputpanel>
+<!--End -->
+<!--Start of the second element-->
+<apex:outputPanel rendered="{!bIsAdmin}">
+<div class="col-md-6" >
+<div class="col-md-3">
+<apex:outputLabel value="Project Name" styleClass="req-label" />
+</div>
+<div class="col-md-9 padLZ">
+
+<apex:outputfield label="Project Name" value="{!oProject.Name}" styleClass="req-adj" /><br/>
+</div>
+</div>
+</apex:outputPanel>
+<!--End of the second element-->
+<div class="col-md-6">
+<div class="col-md-3">
+<apex:outputLabel value="Project Number"/>
+</div>
+<div class="col-md-9">
+<apex:outputfield label="Project Number" value="{!oProject.MPOT_Project_Number__c}"/><br/>
+</div>
+</div>
+</div>
+
+<div class="col-md-12">
+<div class="col-md-6">
+<div class="col-md-3">
+<apex:outputLabel value="Description" styleClass="req-label" />
+</div>
+<div class="col-md-9 padLZ">
+<apex:inputfield label="Description" value="{!oProject.MPOT_Project_Description__c}" styleClass="req col-md-12"/><br/>
+</div>
+</div>
+
+<div class="col-md-6">
+<div class="col-md-3">
+<apex:outputLabel value="Scope" styleClass="req-label"/>
+</div>
+<div class="col-md-9">
+<apex:inputfield label="Scope" value="{!oProject.MPOT_Project_Scope__c}" styleClass="req col-md-12" /><br/>
+</div>
+</div>
+</div>
+
+<div class="col-md-12">
+<div class="nonHSE form-group col-md-6 col-xs-12">
+                  <div class="col-md-3">
+                 <apex:outputLabel value="Project Owner"/>
+                 </div>
+
+                    <div class="fieldHolder input-group col-md-9">
+                        <div class="networkO " style="width:100% !important;"  >
+                       <!-- <apex:outputLabel value="Project Owner"/> -->
+                            <select data-placeholder="{!oProjectPlaceHolder}" style="width:100% !important;" onchange="assignNetworkO(this);"   class="chosen networkOSel div-nonHSE-req form-control" />
+                            <apex:inputField value="{!oProject.MPOT_Project_Owner_Id__c}" styleClass="networkOId sr-only"/>
+                            <apex:inputField value="{!oProject.MPOT_Owner_Name__c}" styleClass="networkOName sr-only "/>
+                        </div>
+                   </div>
+                
+</div>
+<div class="col-md-6">
+<div class="col-md-3">
+<apex:outputLabel value="Project Driver"/>
+</div>
+<div class="col-md-9">
+<apex:inputfield label="Project Driver" value="{!oProject.MPOT_Project_Driver__c}"  styleClass="req"/>
+</div>
+</div>
+</div>
+
+<div class="col-md-12">
+<div class="nonHSE form-group col-md-6 col-xs-12">
+                    <div class="col-md-3">
+                    <apex:outputLabel value="Project Sponsor"/><br/>
+                     </div>
+                    <div class="fieldHolder input-group col-md-9">
+                        <div class="networkS req-chosen" style="width:100% !important;">
+                            <select data-placeholder="{!oProjectPlaceHolder}" style="width:100% !important;" onchange="assignNetworkS(this);"   class="chosen networkSSel div-nonHSE-req form-control"/>
+                            <apex:inputField value="{!oProject.MPOT_Project_Sponsor_Id__c}" styleClass="networkSId  sr-only"/>
+                            <apex:inputField value="{!oProject.MPOT_Project_Sponsor__c}" styleClass="networkSName sr-only "/>
+                        </div>
+                   </div>
+                    
+  </div>
+  
+<div class="col-md-6">
+<div class="col-md-3">
+<apex:outputLabel value="Anchor"/>
+</div>
+<div class="col-md-9">
+<apex:inputfield label="Anchor" value="{!oProject.MPOT_Anchor__c}"  styleClass="req"/>
+</div>
+</div>
+</div>
+  
+ <div class="col-md-12 add-info">
+ <div class="col-md-6 padTZ"><!--to ensure padding uniformity-->
+ <div class="col-md-12 padTZ"><!--to ensure padding uniformity-->
+ <html>
+ <table><tr><td>
+  <b> If the Project Sponsor is not available in the above picklist , you may please add in this text box.</b></td>
+  <td><apex:inputField label="Add New Project Sponsor" value="{!oProject.MPOT_Add_new_Sponsor__c}" styleClass="marginL10"  />   </td>
+ </tr>
+ </table>
+  </html>
+  </div>
+  </div>
+  </div>
+  
+ <div class="col-md-12">
+ <apex:outputpanel rendered="{!bIsNRO}">
+ <div class="col-md-6">
+ <div class="col-md-3">
+<apex:outputLabel value="Network Record Owner"/>
+</div>
+<div class="col-md-9">
+<apex:outputfield label="Network Record Owner" value="{!oProject.OwnerId}"/>
+</div>
+</div>
+</apex:outputpanel>
+
+<apex:outputpanel rendered="{!bIsAdmin}">
+ <!--<div class="col-md-12">-->
+<div class="nonHSE form-group col-md-6 col-xs-12">
+                    <div class="col-md-3">
+                    <apex:outputLabel value="Network Record Owner"/><br/>
+                     </div>
+                    <div class="fieldHolder input-group col-md-9">
+                        <div class="networkN req-chosen" style="width:100% !important;">
+                            <select data-placeholder="{!oProjectPlaceHolder}" style="width:100% !important;" onchange="assignNetworkN(this);"   class="chosen networkNSel div-nonHSE-req form-control"/>
+                            <apex:inputField value="{!oProject.MPOT_Network_Record_Owner_Id__c}" styleClass="networkNId  sr-only"/>
+                            <apex:inputField value="{!oProject.MPOT_Network_Record_Owner_Name__c}" styleClass="networkNName sr-only "/>
+                        </div>
+                   </div>
+                    
+  </div>
+  <!--</div>-->
+</apex:outputpanel>
+
+<div class="col-md-3">
+<html>
+<table><tr><td>
+<!--<div class="col-md-3"> -->
+<apex:outputLabel value="Regulatory Submission and Approval Required "/><br/>
+<!--</div>--></td>
+<td>
+<!--<div class="col-md-9">-->
+<apex:inputfield label="Regulatory Submission and Approval Required" value="{!oProject.MPOT_Regulatory_Impact__c}"  required="true" styleClass="req"/><br/>
+<!--</div>--></td>
+</tr>
+
+</table>
+</html>
+</div>
+
+<div class="col-md-12">
+<div class="nonHSE form-group col-md-6 col-xs-12">
+                    <div class="col-md-3">
+                     </div>
+                    <div class="fieldHolder input-group col-md-9">
+                        <div class="networkS req-chosen" style="width:100% !important;">
+                            
+                        </div>
+                   </div>               
+  </div>
+<div class="col-md-6">
+<div class="col-md-3">
+<apex:outputLabel value="Regulatory Impact Level" />
+</div>
+<div class="col-md-9">
+<apex:inputfield label="Regulatory Impact Level" value="{!oProject.MPOT_Regulatory_Impact_Level__c}" styleClass="req"/>
+</div>
+</div>
+</div>
+
+
+</div>
+<!---Add colour line-->
+<div id="header-color1" class="col-md-12" >Cross Area Impacts</div>
+<div class="col-md-12 seperation" ></div>
+
+
+<!------ Start of div for MPOT_Networks_Project_Impacts__c Multiselect Functionality ------------------>    
+  
+  <div class="nonHSE form-group col-md-12 col-xs-12">
+                    <apex:outputLabel value="Network Initiating" styleClass="displayRequired"/><br/>
+
+                    <div class="fieldH input-group" >
+                        <div class="networkI req-chosen" style="width:100% !important; " >
+                            <select data-placeholder="{!oProjectPlaceHolder}" style="width:100% !important;" onchange="assignNetworkI(this);"   class="chosen networkISel div-nonHSE-req form-control"  />
+                            <apex:inputField value="{!oProject.MPOT_Network_Project_Initiated_from_Id__c}" styleClass="networkIId sr-only " />
+                            <apex:inputField value="{!oProject.MPOT_Network_Project_Initiated_from__c}" styleClass="networkIName sr-only "/>
+                        </div>
+                   </div>
+                    
+  </div>
+               
+  <!------ End of div for MPOT_Networks_Project_Impacts__c Multiselect Functionality ------------------>  
+
+
+  <!------ Start of div for MPOT_Networks_Project_Impacts__c Multiselect Functionality ------------------>    
+  
+  <div class="nonHSE form-group col-md-12 col-xs-12">
+                    <apex:outputLabel value="Networks Impacted" styleClass="displayRequired"/><br/>
+
+                    <div class="fieldH input-group">
+                        <div class="Product req-chosen" style="width:100% !important;">
+                            <select data-placeholder="{!oProjectPlaceHolder}" style="width:100% !important;" onchange="onChangeImpact(this);" multiple="true"  class="chosen ImpactSel div-nonHSE-req form-control" />
+                            <apex:inputField value="{!oProject.MPOT_Networks_Project_Impacts_Id__c}" styleClass="ImpactId sr-only " />
+                            <apex:inputField value="{!oProject.MPOT_Networks_Project_Impacts__c}" styleClass="ImpactName sr-only "  />
+                        </div>
+                   </div>
+                    
+  </div>
+               
+  <!------ End of div for MPOT_Networks_Project_Impacts__c Multiselect Functionality ------------------> 
+       
+  <!------ Start of div for Platform's Multiselect Functionality ------------------> 
+
+  <div class="nonHSE form-group col-md-12 col-xs-12">
+                    <apex:outputLabel value="{!$ObjectType.GLBL_Project__c.fields.MPOT_Platforms__c.label}" styleClass="displayRequired"/><br/>
+
+                    <div class="fieldH input-group">
+                        <div class="Product" style="width:100% !important;">
+                            <select data-placeholder="{!oProjectPlaceHolder}" style="width:100% !important;" onchange="onChangePlatform(this);" multiple="true"  class="chosen PlatformSel div-nonHSE-req form-control"/>
+                           <apex:inputField value="{!oProject.MPOT_Platforms_Id__c}"  styleClass="PlatformId sr-only"/>
+                            <apex:inputField value="{!oProject.MPOT_Platforms__c}" styleClass="PlatformName sr-only" />
+                        </div>
+                   </div>
+                    
+  </div>
+  
+        <!------ Start of div for Site's Multiselect Functionality ------------------> 
+
+  <div class="nonHSE form-group col-md-12 col-xs-12">
+                    <apex:outputLabel value="{!$ObjectType.GLBL_Project__c.fields.MPOT_Sites__c.label}" styleClass="displayRequired"/><br/>
+
+                    <div class="fieldH input-group">
+                        <div class="Sites req-chosen" style="width:100% !important;">
+                            <select data-placeholder="{!oProjectPlaceHolder}" style="width:100% !important;" onchange="onChangeSite(this);" multiple="true"  class="chosen SiteSel div-nonHSE-req form-control"/>
+                           <apex:inputField value="{!oProject.MPOT_Sites_Id__c}" styleClass="SiteId sr-only" />
+                            <apex:inputField value="{!oProject.MPOT_Sites__c}" styleClass="SiteName sr-only"/> 
+                        </div>
+                   </div>
+                    
+  </div>
+          
+  <!------ End of div for Site's Multiselect Functionality ------------------>     
+  
+    <!------ Start of div for Molecule's Multiselect Functionality ------------------> 
+
+  <div class="nonHSE form-group col-md-12 col-xs-12">
+                    <apex:outputLabel value="{!$ObjectType.GLBL_Project__c.fields.MPOT_Molecule_Name__c.label}" styleClass="displayRequired"/><br/>
+
+                    <div class="fieldH input-group">
+                        <div class="Product" style="width:100% !important;">
+                            <select data-placeholder="{!oProjectPlaceHolder}" style="width:100% !important;" onchange="onChangeMolecule(this);" multiple="true"  class="chosen MoleculeSel div-nonHSE-req form-control"/>
+                           <apex:inputField value="{!oProject.MPOT_Molecule_Id__c }" styleClass="MoleculeId sr-only" />
+                            <apex:inputField value="{!oProject.MPOT_Molecule_Name__c}" styleClass="MoleculeName sr-only" /> 
+                        </div>
+                   </div>
+                    
+  </div>
+               
+  <!------ End of div for Molecule's Multiselect Functionality ------------------> 
+
+
+<div class="col-md-12" id="header-color2">
+NRO Notes to the Database Administrator 
+</div>
+<div class="col-md-12 first-div add-info">
+<apex:outputPanel rendered="{!bIsNRO}">
+<div class="col-md-6">
+If the values needed are not present in the pick list provided (Project Owner, Network Initiating, Platform, etc) please provide the information below so it can be added.  This field can also be used for any other comments that need to be communicated to the Database Administrator regarding this new record request.  
+</div>
+</apex:outputpanel>
+
+<apex:outputPanel rendered="{!bIsAdmin}">
+<div class="col-md-6">
+  <apex:outputlabel value="NRO Notes" />
+</div>
+</apex:outputpanel>
+
+<apex:outputPanel rendered="{!bIsNRO}">
+<div class="col-md-6" >
+<apex:inputField label="" value="{!oProject.MPOT_NRO_Comments__c}" styleClass="col-md-12"/>
+</div>
+</apex:outputpanel>
+
+<apex:outputPanel rendered="{!bIsAdmin}">
+<div class="col-md-6" >
+<apex:outputfield label="" value="{!oProject.MPOT_NRO_Comments__c}" styleClass="col-md-12"/>
+</div>
+</apex:outputpanel>
+
+</div>
+
+
+<apex:outputPanel rendered="{!bIsAdmin}">
+<div class="col-md-12" id="header-color2">
+Database Administrator Notes
+</div>
+<div class="col-md-12 first-div add-info">
+<div class="col-md-6">
+    <apex:outputlabel value="Admin Notes" />
+    </div>
+    <div class="col-md-6" >
+    <apex:inputField label="" value="{!oProject.MPOT_Administrative_Comments__c}" styleClass="col-md-12"/>
+    </div>
+</div>
+</apex:outputPanel>
+
+<div id="header-color3" class="col-md-12">
+Project Stage and Gating Slides
+</div>
+<div class="col-md-12 first-div">
+<div class="col-md-6">
+<div class="col-md-3">
+<apex:outputLabel value="Stage" styleClass="reqUp"/>
+</div>
+<div class="col-md-9">
+<apex:inputfield label="Stage" value="{!oProject.MPOT_Stage__c}"  styleClass="req"/><br/>
+</div>
+</div>
+
+<div class="col-md-6">
+<html><table><tr><td>
+<div class="col-md-0">
+<apex:outputLabel value="Gating Slide Exception"/>
+</div></td><td>
+
+<div class="col-md-2">
+<apex:inputCheckbox value="{!oProject.MPOT_Gating_Slide_Exception__c}"/><br/>
+</div>
+</td>
+<td>
+<apex:outputPanel rendered="{!bIsNRO}">
+<div class="col-md-12" style="
+    font-size: x-small;">
+    (Gating Slides are required, if you are requesting an exception click on the box and provide an explanation in the NRO notes to the Database Admin in the field above. )
+</div></apex:outputPanel>
+</td>
+</tr></table></html>
+</div>
+</div>
+
+</apex:form>
+ <apex:form id="error">
+ 
+    <apex:outputPanel id="p5" styleClass="popupBg2" layout="block" />
+    <apex:outputPanel id="p6" styleClass="popup2" layout="block" ><br></br><br></br>
+    <div align ="center"> <b>You do not have access to project records via the Lilly IPAD. If you want to access MPO project records, please log into MPO via Lilly Laptop or Desktop.</b>
+    </div>
+    </apex:outputPanel>
+
+</apex:form>
+</apex:page>

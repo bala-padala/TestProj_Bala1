@@ -1,0 +1,255 @@
+<apex:page docType="html-5.0" sidebar="false" showHeader="false" standardStylesheets="false" controller="MPOT_SearchController">
+<meta charset="utf-8"></meta>
+<meta http-equiv="X-UA-Compatible" content="IE=Edge;chrome=IE8" ></meta>
+<meta name="viewport" content="width=device-width, initial-scale=1" ></meta>
+<apex:stylesheet value="{!URLFOR($Resource.MPOT_Resource,'/css/bootstrap.min.css')}"/>
+<apex:stylesheet value="{!URLFOR($Resource.MPOT_Resource,'/css/gantt/style.css')}"/>
+<!--<link href="css/style.css" type="text/css" rel="stylesheet"></link>-->
+<apex:stylesheet value="{!URLFOR($Resource.MPOT_Resource,'/css/gantt/prettify.min.css')}"/>
+<!--<link href="css/prettify.min.css" rel="stylesheet" type="text/css"></link>-->
+<apex:stylesheet value="{!URLFOR($Resource.MPOT_Resource,'/css/gantt/gantt.css')}"/>
+<apex:stylesheet value="{!URLFOR($Resource.MPOT_Resource,'/css/gantt/gantt.css')}"/>
+<!--<link href="css/gantt.css" rel="stylesheet" type="text/css"></link>--> 
+<apex:stylesheet value="{!URLFOR($Resource.MPOT_Resource,'/css/MPO_ipad_styles.css')}"/>
+
+<style>
+@media print{
+.bar{
+width: 47px; top: 98px; left: 120px;
+    background-color: #D8EDA3!important;
+}
+button{
+height: 24px;
+    background-color: #1797C0!important;
+    color: #fff!important;
+}
+}
+</style>
+
+<!--<!DOCTYPE html>-->
+
+   
+        <title>Gantt Chart</title>
+       
+      
+    
+    
+        <div class="container " style="padding-top:20px">
+            <div class="col-md-12 col-sm-12 dashboard-border" >
+
+              <div class="col-md-6 col-sm-6 dashboard-border-right " >
+        <div class="title col-md-12 " style="padding-top:10px">
+            Hide milestones type from view
+        </div>
+
+
+        <div class="col-md-6 col-sm-6">
+          <div class="checkbox">
+      <label><input type="checkbox" value="Validation" id="trigger"/>Validation</label>
+    </div>
+        <div class="checkbox">
+      <label><input type="checkbox" value="Implementation"/>Implementation</label>
+    </div>
+           
+              <div class="checkbox">
+      <label><input type="checkbox" value="Stability"/>Stability</label>
+    </div>
+
+       <div class="checkbox">
+      <label><input type="checkbox" value="Study"/>Study</label>
+    </div>
+     
+        </div>
+        <div class="col-md-6 col-sm-6">
+<div class="checkbox">
+      <label><input type="checkbox" value="Submission Preparation"/>Submission Preparation</label>
+    </div>
+                  <div class="checkbox">
+      <label><input type="checkbox" value="Submission/Approval"/>Submission/Approval</label>
+    </div>
+       <div class="checkbox">
+      <label><input type="checkbox" value="Next Gate"/>Next Gate</label>
+    </div>
+       <div class="checkbox">
+      <label><input type="checkbox" value="Manufacturability Review"/>Manufacturability Review</label>
+    </div>
+     
+    
+    
+     
+         
+        </div>
+        
+        <!--To take input. added sm-->
+<div class="col-md-12 col-sm-12 ipad-adjust-padding" style="padding:10px;padding-bottom:15px">
+  Change the no. of rows to<br/> <input type="text" id="dpage"></input>
+  <input type="button" class="draw asearch" value="Display"></input>
+</div>
+      </div>
+
+   <div class="col-md-6 col-sm-6 ipad-left-zero">
+    <div class="col-md-12" style="padding-top:10px">
+      Color Key for Milestone Type
+    </div>
+    <div class="col-md-6 col-sm-6 padLZ ipad-margin" >
+    
+       <ul>
+    <li>
+        <div class="input-color">
+            <input type="text" value="Validation" readOnly="true"/>
+            <div class="color-box" style="background-color: #FF850A!important;"></div>
+            <!-- Replace "#FF850A" to change the color -->
+        </div>
+    </li>
+    <li>
+        <div class="input-color">
+            <input type="text" value="Implementation"  readOnly="true"/>
+            <div class="color-box" style="background-color:#D0E4FD!important"></div>
+            <!-- Replace "navy" to change the color -->
+        </div>
+    </li>
+    <li>
+        <div class="input-color">
+            <input type="text" value="Stability" readOnly="true"/>
+            <div class="color-box" style="background-color: #028683!important;"></div>
+            <!-- Replace "navy" to change the color -->
+        </div>
+    </li>
+    <li>
+        <div class="input-color">
+            <input type="text" value="Study" readOnly="true"/>
+            <div class="color-box" style="background-color: #880015!important;"></div>
+            <!-- Replace "navy" to change the color -->
+        </div>
+    </li>
+    
+</ul>
+  
+  
+     <div class="col-md-1 col-sm-1 blue-st">★</div><div class="col-md-10 col-sm-9 padLZ">Regulatory Submission Date</div>
+   
+ 
+    </div>
+    <div class="col-md-6 col-sm-6 padLZ"><!--2. Removed RZ-->
+      <ul>
+      <li>
+        <div class="input-color">
+            <input type="text" value="Submission Preparation" readOnly="true"/>
+            <div class="color-box" style="background-color:#FFC90E!important;"></div>
+            <!-- Replace "navy" to change the color -->
+        </div>
+    </li>
+    <li>
+        <div class="input-color">
+            <input type="text" value="Submission/Approval" readOnly="true"/>
+            <div class="color-box" style="background-color: #F9C4E1!important;"></div>
+
+            <!-- Replace "#FF850A" to change the color -->
+        </div>
+    </li>
+    <li>
+        <div class="input-color">
+            <input type="text" value="Next Gate" readOnly="true"/>
+            <div class="color-box" style="background-color: navy!important;"></div>
+            <!-- Replace "navy" to change the color -->
+        </div>
+    </li>
+    <li>
+        <div class="input-color">
+            <input type="text" value="Manufacturability Review" readOnly="true"/>
+            <div class="color-box" style="background-color: #D8EDA3!important;"></div>
+            <!-- Replace "navy" to change the color -->
+        </div>
+    </li>
+     
+    
+</ul>
+<!--<div class="col-md-12 paddingT"> removed to make mirror image-->
+<div class="col-md-1 col-sm-1 red-st ">★</div><div class="col-md-9 col-sm-7 padLZ">Regulatory Approval Date</div>
+<!--</div>-->
+<!--2.was 8 changed to 7-->
+    </div>
+   
+
+
+   </div>
+
+
+</div>
+
+       </div>
+
+        <div class="container">
+        <div class="col-md-1 col-sm-1 paddingB" style="padding-top:90px" id="bdiv">
+          <!--  <button type="button" class="btn btn-default bt-style omit" value="0" id="button0"> Omit</button>
+            <button type="button" class="btn btn-default bt-style omit" value="1" id="button1" >Omit</button>
+            <button type="button" class="btn btn-default bt-style omit" value="2" id="button2">Omit</button>
+             <button type="button" class="btn btn-default bt-style omit" value="3" id="button3">Omit</button>
+              <button type="button" class="btn btn-default bt-style omit" value="4" id="button4">Omit</button>
+               <button type="button" class="btn btn-default bt-style omit" value="5" id="button5">Omit</button>
+                <button type="button" class="btn btn-default bt-style omit" value="6" id="button6">Omit</button>
+                 <button type="button" class="btn btn-default bt-style omit" value="7" id="button7">Omit</button>
+                  <button type="button" class="btn btn-default bt-style omit" value="8" id="button8">Omit</button>
+                   <button type="button" class="btn btn-default bt-style omit" value="9" id="button9">Omit</button>
+                   <button type="button" class="btn btn-default bt-style omit" value="10" id="button10">Omit</button>
+                   <button type="button" class="btn btn-default bt-style omit" value="11" id="button11">Omit</button>
+                   <button type="button" class="btn btn-default bt-style omit" value="12" id="button12">Omit</button>
+                   <button type="button" class="btn btn-default bt-style omit" value="13" id="button13">Omit</button>
+                   <button type="button" class="btn btn-default bt-style omit" value="14" id="button14">Omit</button>
+                   <button type="button" class="btn btn-default bt-style omit" value="15" id="button15">Omit</button>
+                   <button type="button" class="btn btn-default bt-style omit" value="16" id="button16">Omit</button>
+                   <button type="button" class="btn btn-default bt-style omit" value="17" id="button17">Omit</button>
+                   <button type="button" class="btn btn-default bt-style omit" value="18" id="button18">Omit</button>
+                   <button type="button" class="btn btn-default bt-style omit" value="19" id="button19">Omit</button>
+                   <button type="button" class="btn btn-default bt-style omit" value="20" id="button20">Omit</button>
+                   <button type="button" class="btn btn-default bt-style omit" value="21" id="button21">Omit</button>
+                   <button type="button" class="btn btn-default bt-style omit" value="22" id="button22">Omit</button>
+                   <button type="button" class="btn btn-default bt-style omit" value="23" id="button23">Omit</button>
+                   <button type="button" class="btn btn-default bt-style omit" value="24" id="button24">Omit</button>
+                   <button type="button" class="btn btn-default bt-style omit" value="25" id="button25">Omit</button>
+                   <button type="button" class="btn btn-default bt-style omit" value="26" id="button26">Omit</button>
+                   <button type="button" class="btn btn-default bt-style omit" value="27" id="button27">Omit</button>
+                   <button type="button" class="btn btn-default bt-style omit" value="28" id="button28">Omit</button>
+                   <button type="button" class="btn btn-default bt-style omit" value="29" id="button29">Omit</button>-->
+        </div>
+
+            <div class="col-md-11 col-sm-11 padRZ">
+
+            <div class="gantt"></div>
+        </div>
+    </div>
+    <div class="container">
+      <div class="col-md-12 search-criteria padLZ padRZ" >
+       
+      </div>
+    </div>
+     
+
+    
+
+    <!--<script src="js/jquery.min.js"></script>
+    <script src="js/jquery.cookie.min.js"></script>
+    <script src="js/jquery.fn.gantt.js"></script>
+    <script src="js/bootstrap.min.js"></script>
+    <script src="js/prettify.min.js"></script>-->
+    <apex:includeScript value="{!URLFOR($Resource.MPOT_Resource,'/js/gantt/jquery.min.js')}"/>
+   
+<apex:includeScript value="{!URLFOR($Resource.MPOT_Resource,'/js/gantt/jquery.cookie.min.js')}"/>
+
+<apex:includeScript value="{!URLFOR($Resource.MPOT_Resource,'/js/gantt/jquery.fn.gantt.js')}"/>
+
+<apex:includeScript value="{!URLFOR($Resource.MPOT_Resource,'/js/bootstrap.min.js')}"/>
+
+
+<apex:includeScript value="{!URLFOR($Resource.MPOT_Resource,'/js/gantt/prettify.min.js')}"/>
+
+<apex:includeScript value="{!URLFOR($Resource.MPOT_Resource,'/js/gantt/msplice.js')}"/>
+   
+ 
+ <apex:includeScript value="{!URLFOR($Resource.MPOT_Resource,'/js/gantt/gantt.js')}"/>  
+  
+
+
+
+  
+</apex:page>

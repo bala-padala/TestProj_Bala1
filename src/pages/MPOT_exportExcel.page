@@ -1,0 +1,89 @@
+<apex:page controller="MPOT_SearchController" action="{!export}" cache="true" contentType="application/vnd.ms-excel#Export_Records.xls" showHeader="false">
+ <head>
+    <meta http-equiv="Content-Type" content="text/html;charset=UTF-8" />
+</head>
+
+  <apex:dataTable value="{!lstwrapper}" var="x" id="resultTable" columns="20">
+                 <apex:column >
+                     <apex:facet name="header">Project Number</apex:facet>
+                     <apex:outputText value="{!x.pNumber}"/>
+                 </apex:column>
+                 <apex:column >
+                     <apex:facet name="header">Project Name</apex:facet>
+                     <apex:outputText value="{!x.pName}"/>
+                 </apex:column>
+                 <apex:column >
+                     <apex:facet name="header">Stage</apex:facet>
+                     <apex:outputText value="{!x.pStage}"/>
+                 </apex:column>
+                 <apex:column >
+                     <apex:facet name="header">Anchor</apex:facet>
+                     <apex:outputText value="{!x.pAnchor}"/>
+                 </apex:column>
+                <apex:column >
+                     <apex:facet name="header">Project Description</apex:facet>
+                     <apex:outputText value="{!x.pDescription}"/>
+                 </apex:column>
+                 <apex:column >
+                     <apex:facet name="header">Project Scope</apex:facet>
+                     <apex:outputText value="{!x.pScope}"/>
+                 </apex:column>
+                 <apex:column >
+                     <apex:facet name="header">Project Owner</apex:facet>
+                     <apex:outputText value="{!x.pOwner}"/>
+                 </apex:column>
+                 <apex:column >
+                     <apex:facet name="header">Project Sponsor</apex:facet>
+                     <apex:outputText value="{!x.pSponsor}"/>
+                 </apex:column>
+                 <apex:column >
+                     <apex:facet name="header">Network Record Owner</apex:facet>
+                     <apex:outputText value="{!x.pRecordOwner}"/>
+                 </apex:column>
+                 <apex:column >
+                     <apex:facet name="header">Networks Project Initiated From</apex:facet>
+                     <apex:outputText value="{!x.pNetworksProjectInitiatedFrom}"/>
+                 </apex:column>
+                 <apex:column >
+                     <apex:facet name="header">Networks Project Impacts</apex:facet>
+                     <apex:outputText value="{!x.pNetworksProjectImpacts}"/>
+                 </apex:column>
+                 <apex:column >
+                     <apex:facet name="header">Site</apex:facet>
+                     <apex:outputText value="{!x.pSite}"/>
+                 </apex:column>
+                 <apex:column >
+                     <apex:facet name="header">Drug Product/Platforms Impacted</apex:facet>
+                     <apex:outputText value="{!x.pPlatforms}"/>
+                 </apex:column>
+                 <apex:column >
+                     <apex:facet name="header">Molecules</apex:facet>
+                     <apex:outputText value="{!x.pMolecules}"/>
+                 </apex:column>
+                 <apex:column >
+                     <apex:facet name="header">Regulatory Impact</apex:facet>
+                     <apex:outputText value="{!x.pRegulatoryImpact}"/>
+                 </apex:column>
+                 <apex:column >
+                     <apex:facet name="header">Regulatory Impact Level</apex:facet>
+                     <apex:outputText value="{!x.pRegulatoryImpactLevel}"/>
+                 </apex:column>
+                 <apex:column >
+                     <apex:facet name="header">Project Driver</apex:facet>
+                     <apex:outputText value="{!x.pProjectDriver}"/>
+                 </apex:column>
+                 <apex:column >
+                     <apex:facet name="header">Current Status (Monthly Update)</apex:facet>
+                     <apex:outputText value="{!x.pCurrentStatus}"/>
+                 </apex:column>
+                 <apex:column >
+                     <apex:facet name="header">Changes Issues (Monthly Update)</apex:facet>
+                     <apex:outputText value="{!x.pChangesIssues}"/>
+                 </apex:column>
+                 <apex:column >
+                     <apex:facet name="header">Monthly Update Date</apex:facet>
+                     <apex:outputText value="{!x.MonthlyUpdateDate}"/>
+                 </apex:column>
+                 
+          </apex:dataTable>
+</apex:page>

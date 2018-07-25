@@ -1,0 +1,343 @@
+<apex:page standardController="GLBL_Project__c" extensions="MPOT_ChangeRecReqController" sidebar="false">
+<apex:includeScript value="{!URLFOR($Resource.MPOT_Resource,'/js/jquery-2.1.4.min.js')}"/>
+<apex:includeScript value="{!URLFOR($Resource.MPOT_Resource,'/js/chosen.jquery.min.js')}"/>
+<apex:includeScript value="{!URLFOR($Resource.MPOT_Resource,'/js/jquery.validate.min.js')}"/>
+<apex:includeScript value="{!URLFOR($Resource.MPOT_Resource,'/js/jquery-ui.js')}"/>
+<apex:includeScript value="{!URLFOR($Resource.MPOT_Resource,'/js/bootstrap.min.js')}"/>
+<!--Static resource for MPO-->
+<apex:includeScript value="{!URLFOR($Resource.MPOT_Resource,'/js/MPO_Handler.js')}"/>
+<apex:includeScript value="{!URLFOR($Resource.MPOT_Resource,'/js/MPO_ChangeLoad.js')}"/>
+<apex:includeScript value="{!URLFOR($Resource.MPOT_Resource,'/js/MPO_ChangeMolecules.js')}"/>
+
+<!--CSS-->
+<apex:stylesheet value="{!URLFOR($Resource.MPOT_Resource,'/css/chosen.min.css')}"/>
+<apex:stylesheet value="{!URLFOR($Resource.MPOT_Resource,'/css/bootstrap.min.css')}"/>
+
+<apex:stylesheet value="{!URLFOR($Resource.MPOT_Resource,'/css/MPO_styles.css')}"/>
+
+<apex:form >
+<apex:pageBlock >
+ 
+ 
+   
+
+<apex:outputPanel rendered="{!bIsNRO}">
+<div align = "left">
+<b>NRO Change Record Request </b>
+</div>  
+</apex:outputpanel>
+
+<div align = "center" class="col-md-12">
+<apex:Messages style="color:Red;font-weight:bold;"/>
+<apex:commandButton value="Save Change Request " action="{!saveCR}" styleClass="mpo-button"/>
+<apex:commandButton value="Cancel Change Request" action="{!cancelCR}" immediate="true" styleClass="mpo-button"/>
+</div>
+    
+<apex:pageBlockSection columns="2" title="Current Basic Project Information Details">
+<apex:outputField label="Project Name" value="{!oProject.Name}"/>
+<apex:outputField label="Project #" value="{!oProject.MPOT_Project_Number__c}"/>
+<apex:outputField label="Description" value="{!oProject.MPOT_Project_Description__c}"/>
+<apex:outputField label="Scope" value="{!oProject.MPOT_Project_Scope__c}"/>
+<apex:outputField label="Project Owner" value="{!oProject.MPOT_Project_Owner__c}"/>
+<apex:outputField label="Project Driver" value="{!oProject.MPOT_Project_Driver__c}"/>
+<apex:outputField label="Project Sponsor" value="{!oProject.MPOT_Project_Sponsor__c}"/>
+<apex:outputField label="Stage" value="{!oProject.MPOT_Stage__c}"/>
+<apex:outputField label="Network Record Owner" value="{!oProject.OwnerId}"/>
+<apex:outputField label="Regulatory Submission and Approval Required" value="{!oProject.MPOT_Regulatory_Impact__c}"/>
+
+<!-- Added by Manoj -->
+<apex:outputField label="Anchor" value="{!oProject.MPOT_Anchor__c}"/>
+<apex:outputField label="Regulatory Impact Level" value="{!oProject.MPOT_Regulatory_Impact_Level__c}"/>
+<apex:outputField label="Network Initiating" value="{!oProject.MPOT_Network_Project_Initiated_from__c}"/>
+<apex:outputField label="Networks Impacted" value="{!oProject.MPOT_Networks_Project_Impacts__c}"/>
+<apex:outputField label="Drug Product/Platform Impacted" value="{!oProject.MPOT_Platforms__c}"/>
+<apex:outputField label="Sites Impacted" value="{!oProject.MPOT_Sites__c}"/>
+<apex:outputField label="Molecules Impacted" value="{!oProject.MPOT_Molecule_Name__c}"/>    
+</apex:pageBlockSection>
+    
+    
+
+
+<div id="header-color1" class="col-md-12" >Changes Requested</div>
+    
+<div >
+ Until a Change Request has been acted upon by the Database Administrator, changes can be made to the request. Once the request has been acted upon by the Database Administrator changes can not be made.   
+</div>
+
+<!--First Row-->
+
+<div class="col-md-12 first-div">
+
+<!--Encapsulate this in an element and rerender it based on condition  -->
+<apex:outputpanel rendered="{!bIsNRO}">
+<div class="col-md-6" >
+<div class="col-md-3" >
+<apex:outputLabel value="Change Project Name To" styleClass="req-label" />
+ <apex:outputLabel value=" (40 Character Limit)" style="font-size:x-small;" />
+</div>
+<div class="col-md-9 padLZ" >
+<apex:inputfield label="Changed Project Name" value="{!oProject.MPOT_Changed_Project_Name__c}" required="true" styleClass="req" style="width:400px" /><br/>
+</div>
+</div>
+</apex:outputpanel>
+<!--End -->
+</div>
+
+<div class="col-md-12">
+<div class="col-md-6">
+<div class="col-md-3">
+<apex:outputLabel value="Change Description To" styleClass="req-label" />
+</div>
+<div class="col-md-9 padLZ">
+<apex:inputfield label="Change Description To" value="{!oProject.MPOT_Changed_Project_Description__c}" styleClass="req col-md-12" required="true"/><br/>
+</div>
+</div>
+
+<div class="col-md-6">
+<div class="col-md-3">
+<apex:outputLabel value="Change Scope To" styleClass="req-label"/>
+</div>
+<div class="col-md-9">
+<apex:inputfield label="Change Scope To" value="{!oProject.MPOT_Changed_Project_Scope__c}" styleClass="req col-md-12" required="true"/><br/>
+</div>
+</div>
+</div>
+
+<div class="col-md-12">
+<div class="nonHSE form-group col-md-6 col-xs-12">
+                  <div class="col-md-3">
+                 <apex:outputLabel value="Change Project Owner To"/>
+                 </div>
+
+                    <div class="fieldHolder input-group col-md-9">
+                        <div class="networkO " style="width:100% !important;"  >
+                       <!-- <apex:outputLabel value="Changed Project Owner"/> -->
+                            <select data-placeholder="{!oProjectPlaceHolder}" style="width:100% !important;" onchange="assignNetworkO(this);"   class="chosen networkOSel div-nonHSE-req form-control" />
+                            <apex:inputField value="{!oProject.MPOT_Changed_Project_Owner_Id__c}" styleClass="networkOId sr-only"/>
+                            <apex:inputField value="{!oProject.MPOT_Changed_Owner_Name__c}" styleClass="networkOName sr-only "/>
+                        </div>
+                   </div>
+                
+</div>
+<div class="col-md-6">
+<div class="col-md-3">
+<apex:outputLabel value="Change Project Driver To"/>
+</div>
+<div class="col-md-9">
+<apex:inputfield label="Changed Project Driver" value="{!oProject.MPOT_Changed_Project_Driver__c}"  required="true" styleClass="req"/>
+</div>
+</div>
+</div>
+
+<div class="col-md-12">
+<div class="nonHSE form-group col-md-6 col-xs-12">
+                    <div class="col-md-3">
+                    <apex:outputLabel value="Change Project Sponsor To"/><br/>
+                     </div>
+                    <div class="fieldHolder input-group col-md-9">
+                        <div class="networkS req-chosen" style="width:100% !important;">
+                            <select data-placeholder="{!oProjectPlaceHolder}" style="width:100% !important;" onchange="assignNetworkS(this);"   class="chosen networkSSel div-nonHSE-req form-control"/>
+                            <apex:inputField value="{!oProject.MPOT_Changed_Project_Sponsor_Id__c}" styleClass="networkSId  sr-only"/>
+                            <apex:inputField value="{!oProject.MPOT_Changed_Project_Sponsor__c}" styleClass="networkSName sr-only "/>
+                        </div>
+                   </div>
+                    
+  </div>
+    
+<div class="col-md-6">
+<div class="col-md-3">
+<apex:outputLabel value="Change Stage To" styleClass="reqUp"/>
+</div>
+<div class="col-md-9">
+<apex:inputfield label="Changed Stage" value="{!oProject.MPOT_Changed_Stage__c}" required="true" styleClass="req"/><br/>
+</div>
+</div>  
+    
+  </div>
+  
+  
+ <div class="col-md-12 add-info">
+ <div class="col-md-6 padTZ"><!--to ensure padding uniformity-->
+ <div class="col-md-12 padTZ"><!--to ensure padding uniformity-->
+ <html>
+ <table><tr><td>
+  <b> If the Project Sponsor is not available in the above picklist , you may please add in this text box.</b></td>
+  <td><apex:inputField label="Add New Project Sponsor" value="{!oProject.MPOT_Changed_Add_New_Sponsor__c}" styleClass="marginL10"  />   </td>
+ </tr>
+ </table>
+  </html>
+  </div>
+  </div>
+
+<div class="col-md-6">
+<div class="col-md-3">
+<apex:outputLabel value="Change Anchor To" styleClass="reqUp"/>
+</div>
+<div class="col-md-9">
+<apex:inputfield label="Changed Anchor" value="{!oProject.MPOT_Changed_Anchor__c}" required="true" styleClass="req"/><br/>
+</div>
+ 
+</div> 
+</div>
+  
+<div class="col-md-12">
+<div class="col-md-12">
+<div class="col-md-3">
+<apex:outputLabel value="Change Regulatory Impact To" />
+</div>
+<div class="col-md-9">
+<apex:inputfield label="Change Regulatory Impact To" value="{!oProject.MPOT_Change_Regulatory_Impact_To__c}" required="true" styleClass="req"/><br/>
+</div>
+</div> 
+</div>
+<div class="col-md-12">
+<div class="col-md-12">
+<div class="col-md-3">
+<apex:outputLabel value="Change Regulatory Impact Level To"/>
+</div>
+<div class="col-md-9">
+<apex:inputfield label="Change Regulatory Impact Level To" value="{!oProject.MPOT_Changed_Regulatory_Impact_Level__c}" required="true" styleClass="req"/><br/>
+</div>
+</div>  
+</div>
+ 
+ <!---Add colour line-->
+<div class="col-md-12 seperation" ></div>
+
+
+<!------ Start of div for MPOT_Networks_Project_Initiated__c Multiselect Functionality ------------------>    
+  
+  <div class="nonHSE form-group col-md-12 col-xs-12">
+                    <apex:outputLabel value="Change Network Initiating To" styleClass="displayRequired"/><br/>
+
+                    <div class="fieldH input-group">
+                        <div class="networkI req-chosen" style="width:100% !important;">
+                            <select data-placeholder="{!oProjectPlaceHolder}" style="width:100% !important;" onchange="assignNetworkI(this);"   class="chosen networkISel div-nonHSE-req form-control"/>
+                            <apex:inputField value="{!oProject.MPOT_Changed_Netwrk_Project_Initiated_Id__c}" styleClass="networkIId sr-only "/>
+                            <apex:inputField value="{!oProject.MPOT_Changed_Netwrk_Proj_Initiated_from__c}" styleClass="networkIName sr-only "/>
+                        </div>
+                   </div>
+                    
+  </div>
+               
+  <!------ End of div for MPOT_Networks_Project_Initiated__c Multiselect Functionality ------------------>  
+
+
+  <!------ Start of div for MPOT_Networks_Project_Impacts__c Multiselect Functionality ------------------>    
+  
+  <div class="nonHSE form-group col-md-12 col-xs-12">
+                    <apex:outputLabel value="Change Networks Impacted To" styleClass="displayRequired"/><br/>
+
+                    <div class="fieldH input-group">
+                        <div class="Product req-chosen" style="width:100% !important;">
+                            <select data-placeholder="{!oProjectPlaceHolder}" style="width:100% !important;" onchange="onChangeImpact(this);" multiple="true"  class="chosen ImpactSel div-nonHSE-req form-control" />
+                            <apex:inputField value="{!oProject.MPOT_Changed_Networks_Project_Impacts_Id__c}" styleClass="ImpactId sr-only " />
+                            <apex:inputField value="{!oProject.MPOT_Changed_Networks_Project_Impacts__c}" styleClass="ImpactName sr-only "  />
+                        </div>
+                   </div>
+                    
+  </div>
+               
+  <!------ End of div for MPOT_Networks_Project_Impacts__c Multiselect Functionality ------------------> 
+       
+  <!------ Start of div for Platform's Multiselect Functionality ------------------> 
+
+  <div class="nonHSE form-group col-md-12 col-xs-12">
+                    <apex:outputLabel value="Change Drug Product/Platform Impacted To" styleClass="displayRequired"/><br/>
+
+                    <div class="fieldH input-group">
+                        <div class="Product" style="width:100% !important;">
+                            <select data-placeholder="{!oProjectPlaceHolder}" style="width:100% !important;" onchange="onChangePlatform(this);" multiple="true"  class="chosen PlatformSel div-nonHSE-req form-control"/>
+                           <apex:inputField value="{!oProject.MPOT_Changed_Platforms_Id__c}"  styleClass="PlatformId sr-only"/>
+                            <apex:inputField value="{!oProject.MPOT_Changed_Platforms__c}" styleClass="PlatformName sr-only" />
+                        </div>
+                   </div>
+                    
+  </div>
+    
+    <!------ End of div for Platform's Multiselect Functionality ------------------>
+  
+        <!------ Start of div for Site's Multiselect Functionality ------------------> 
+
+  <div class="nonHSE form-group col-md-12 col-xs-12">
+                    <apex:outputLabel value="Change Sites Impacted To" styleClass="displayRequired"/><br/>
+
+                    <div class="fieldH input-group">
+                        <div class="Sites req-chosen" style="width:100% !important;">
+                            <select data-placeholder="{!oProjectPlaceHolder}" style="width:100% !important;" onchange="onChangeSite(this);" multiple="true"  class="chosen SiteSel div-nonHSE-req form-control"/>
+                           <apex:inputField value="{!oProject.MPOT_Changed_Sites_Id__c}" styleClass="SiteId sr-only" />
+                            <apex:inputField value="{!oProject.MPOT_Changed_Sites__c}" styleClass="SiteName sr-only"/> 
+                        </div>
+                   </div>
+                    
+  </div>
+          
+  <!------ End of div for Site's Multiselect Functionality ------------------>     
+  
+    <!------ Start of div for Molecule's Multiselect Functionality ------------------> 
+
+  <div class="nonHSE form-group col-md-12 col-xs-12">
+                    <apex:outputLabel value="Change Molecules Impacted To" styleClass="displayRequired"/><br/>
+
+                    <div class="fieldH input-group">
+                        <div class="Product" style="width:100% !important;">
+                            <select data-placeholder="{!oProjectPlaceHolder}" style="width:100% !important;" onchange="onChangeMolecule(this);" multiple="true"  class="chosen MoleculeSel div-nonHSE-req form-control"/>
+                           <apex:inputField value="{!oProject.MPOT_Changed_Molecule_Id__c }" styleClass="MoleculeId sr-only" />
+                            <apex:inputField value="{!oProject.MPOT_Changed_Molecule_Name__c}" styleClass="MoleculeName sr-only" /> 
+                        </div>
+                   </div>
+                    
+  </div>
+               
+  <!------ End of div for Molecule's Multiselect Functionality ------------------> 
+
+
+<div class="col-md-12" id="header-color2">
+Request Other Changes - NRO Notes to the Database Administrator 
+</div>
+<div class="col-md-12 first-div add-info">
+<apex:outputPanel rendered="{!bIsNRO}">
+<div class="col-md-6">
+If the values needed are not present in the pick list provided (Project Owner, Network Initiating, Platform, etc) please provide the information below so it can be added.  This field can also be used for any other comments that need to be communicated to the Database Administrator regarding this new record request.  
+</div>
+</apex:outputpanel>
+
+<apex:outputPanel rendered="{!bIsAdmin}">
+<div class="col-md-6">
+  <apex:outputlabel value="NRO Notes" />
+</div>
+</apex:outputpanel>
+
+<apex:outputPanel rendered="{!bIsNRO}">
+<div class="col-md-6" >
+<apex:inputField label="" value="{!oProject.MPOT_Changed_NRO_Comments__c}" styleClass="col-md-12"/>
+</div>
+</apex:outputpanel>
+
+<apex:outputPanel rendered="{!bIsAdmin}">
+<div class="col-md-6" >
+<apex:outputfield label="" value="{!oProject.MPOT_Changed_NRO_Comments__c}" styleClass="col-md-12"/>
+</div>
+</apex:outputpanel>
+
+
+<apex:outputPanel rendered="{!bIsAdmin}">
+<div class="col-md-12" id="header-color2">
+Database Administrator Notes
+</div>
+<div class="col-md-12 first-div add-info">
+<div class="col-md-6">
+    <apex:outputlabel value="Admin Notes" />
+    </div>
+    <div class="col-md-6" >
+    <apex:inputField label="" value="{!oProject.MPOT_Administrative_Comments__c}" styleClass="col-md-12"/>
+    </div>
+</div>
+</apex:outputPanel>
+
+
+</div>
+
+ </apex:pageBlock>
+</apex:form>
+</apex:page>

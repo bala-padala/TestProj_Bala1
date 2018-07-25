@@ -1,0 +1,60 @@
+<apex:page standardController="MPOT_Project_Milestone__c" extensions="MPOT_MilestoneController" sidebar="false" >
+<script type="text/javascript">
+window.onload = setFocus
+function setFocus() {
+document.getElementById("hiddenElement").focus();
+}
+</script>
+
+<apex:stylesheet value="{!URLFOR($Resource.MPOT_Resource,'/css/chosen.min.css')}"/>
+<apex:stylesheet value="{!URLFOR($Resource.MPOT_Resource,'/css/bootstrap.min.css')}"/>
+<apex:stylesheet value="{!URLFOR($Resource.MPOT_Resource,'/css/MPO_styles.css')}"/>
+<apex:stylesheet value="{!URLFOR($Resource.MPOT_Resource,'/css/MPO_common.css')}"/>
+<apex:form >
+<input id="hiddenElement" type="hidden" />
+<div align="center">
+<apex:messages style="color:Red;font-weight:bold;" /></div>
+<apex:pageBlock >
+<div align="center">
+<apex:commandButton value="Confirm" action="{!Confirm}" styleClass="mpo-button"/>
+<apex:commandButton value="Cancel" action="{!cancel}" styleClass="mpo-button"/>
+<!--<apex:commandButton value="Delete"  onclick="return confirm('Are you sure you want to delete?');" action="{!del}" styleClass="mpo-button"/> --></div>
+<apex:pageBlockSection title="Milestones">
+
+  
+    
+   
+                <apex:pageBlockSectionItem >
+                <apex:outputLabel >Milestone</apex:outputLabel>
+                <apex:actionRegion >
+                <apex:selectList value="{!Milestone}" size="1" styleClass="req col-md-9" >
+                    <apex:selectOptions value="{!milestoneList}"></apex:selectOptions>
+                    <apex:actionSupport event="onchange" action="{!SubMile}"/>
+                </apex:selectList>
+                </apex:actionRegion>
+                </apex:pageBlockSectionItem>
+                
+                 <apex:pageBlockSectionItem >
+                <apex:outputLabel >Milestone Status</apex:outputLabel>
+                <apex:inputField value="{!oMilestone.Milestone_Status__c}"/>
+                </apex:pageBlockSectionItem>
+                
+                 <apex:pageBlockSectionItem >
+                <apex:outputLabel >Sub-Milestone</apex:outputLabel>
+                <apex:selectList value="{!Submilestone}" size="1"  id="subCat"  >
+                    <apex:selectOptions value="{!SubmilestoneList}"></apex:selectOptions>
+                </apex:selectList>
+                </apex:pageBlockSectionItem>
+
+    <apex:inputfield label="Actual Start" value="{!oMilestone.Start_date__c}" styleClass="req col-md-9" style="width:8em" />
+    <apex:inputfield label="Actual End" value="{!oMilestone.End_date__c}" styleClass="req col-md-9" style="width:8em"/>
+    <apex:inputfield label="Milestone Detail" value="{!oMilestone.Milestone_detail__c}" style="height:100px; width:300px;"/>
+    <apex:inputfield label="Milestone Notes" value="{!oMilestone.Milestone_Note__c}" style="height:100px; width:300px;"/>
+    <apex:outputfield label="Project Name" value="{!oMilestone.Project_Name__c}"/>
+ </apex:pageBlockSection>   
+</apex:pageBlock>
+
+
+</apex:form>
+
+</apex:page>

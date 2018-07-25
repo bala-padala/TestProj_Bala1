@@ -1,0 +1,47 @@
+<apex:page standardController="MPOT_Project_Milestone__c"  extensions="MPOT_MilestoneController" sidebar="false" >
+
+<apex:stylesheet value="{!URLFOR($Resource.MPOT_Resource,'/css/chosen.min.css')}"/>
+<apex:stylesheet value="{!URLFOR($Resource.MPOT_Resource,'/css/bootstrap.min.css')}"/>
+<apex:stylesheet value="{!URLFOR($Resource.MPOT_Resource,'/css/MPO_styles.css')}"/>   
+<apex:stylesheet value="{!URLFOR($Resource.MPOT_Resource,'/css/MPO_common.css')}"/>
+
+<apex:form >
+<apex:pageBlock >
+
+<apex:outputPanel id="buttonPannel" rendered="{!(bIsOwner && bIsPO)}">
+<div align="center">
+
+<apex:messages style="color:Red;font-weight:bold;" />
+<apex:commandButton value="Modify Dates" action="{!modify}" styleClass="mpo-button" rendered="{!(NOT(modify))}"/>
+
+<apex:commandButton value="Save" action="{!confirm_milestoneupdate}" styleClass="mpo-button" />
+<apex:commandButton value="Cancel" action="{!cancel_milestoneupdate}" styleClass="mpo-button"/>
+<apex:commandButton value="Delete"  onclick="return confirm('Are you sure you want to delete?');" action="{!del}" styleClass="mpo-button"/>
+
+</div></apex:outputPanel>
+
+<apex:pageBlockSection title="Milestones"  >
+     <apex:outputfield label="Project Name" value="{!oMilestone.Project_Name__c}"/>
+     <apex:pageblocksectionitem ></apex:pageblocksectionitem>
+     <apex:outputfield label="Milestone" value="{!oMilestone.Milestone_name__c}" />
+     <apex:outputfield label="Milestone Status" value="{!oMilestone.Milestone_Status__c}" />
+     <apex:outputfield label="Submilestone" value="{!oMilestone.Sub_Milestone_name__c}" />
+     <apex:outputfield label="Actual Start" value="{!oMilestone .Start_date__c}"/>
+     <apex:outputfield label="Actual End" value="{!oMilestone .End_date__c}"/>
+   
+     <apex:inputfield label="Milestone Detail" value="{!oMilestone.Milestone_detail__c}"  style="height:100px; width:300px;" rendered="{!(bIsOwner && bIsPO)}"/>
+     <apex:inputfield label="Milestone Notes" value="{!oMilestone.Milestone_Note__c}"  style="height:100px; width:300px;" rendered="{!(bIsOwner && bIsPO)}"/>
+     <!--Display as output fields for non PO or POP-->
+     <apex:outputfield label="Milestone Detail" value="{!oMilestone.Milestone_detail__c}"  style="height:100px; width:300px;" rendered="{!NOT(bIsOwner && bIsPO)}"/>
+     <apex:outputfield label="Milestone Notes" value="{!oMilestone.Milestone_Note__c}"  style="height:100px; width:300px;" rendered="{!NOT(bIsOwner && bIsPO)}"/>
+</apex:pageBlockSection>  
+<apex:pageBlockSection title="" collapsible="false">   
+     <apex:inputField label="New Start Date" value="{!oMilestone.New_Start_Date__c}" rendered="{!modify}"  styleClass="req col-md-9" style="width:8em"/>
+     <apex:inputField label="New End Date" value="{!oMilestone.New_End_Date__c}" rendered="{!modify}"  styleClass="req col-md-9" style="width:8em"/>
+     <apex:inputField label="Reason for change" value="{!oMilestone.Reason_For_Change__c}" rendered="{!modify}" styleClass="req col-md-9"/>
+</apex:pageBlockSection> 
+</apex:pageBlock>
+</apex:form>
+
+
+</apex:page>

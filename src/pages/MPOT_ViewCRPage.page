@@ -1,0 +1,259 @@
+<apex:page id="view" standardController="GLBL_Project__c" extensions="MPOT_ViewCRController" sidebar="false" standardStylesheets="false">
+    <!--CSS-->
+    <apex:stylesheet value="{!URLFOR($Resource.MPOT_Resource,'/css/chosen.min.css')}" />
+    <apex:stylesheet value="{!URLFOR($Resource.MPOT_Resource,'/css/bootstrap.min.css')}" />
+
+    <style type="text/css">
+        .popup {
+            background-color: white;
+            border-width: 2px;
+            border-style: solid;
+            z-index: 9999;
+            left: 50%;
+            padding: 10px;
+            position: absolute;
+            width: 450px;
+            margin-left: -250px;
+            top: 800px;
+        }
+        
+        .popupBg {
+            background-color: black;
+            opacity: 0.20;
+            filter: alpha(opacity=70);
+            position: absolute;
+            width: 100%;
+            height: 100%;
+            top: 0;
+            left: 0;
+            z-index: 9998;
+        }
+    </style>
+    <style>
+        .conditional-hideLinks .actionColumn {
+            display: {!if(oProject.MPOT_New_Project_Request_Approved__c && NOT(bIsAdmin), "none", "table-cell")};
+        }
+        
+        .conditional-hideLinksMilestone .actionColumn {
+            display: none;
+        }
+    </style>
+
+    <apex:form >
+        <apex:pageBlock >
+            <apex:outputPanel >
+
+                <apex:outputPanel rendered="{!bIsNRO}">
+                    <div align="left">
+                        <b>NRO Change Record Request Preview</b>
+                    </div>
+                </apex:outputpanel>
+
+                <!--
+                Change Project Request Created
+                <apex:outputField label="Change Project Request Created" value="{!oProject.MPOT_NRO_CR_Created_Indicator__c}"/><br/>
+                -->
+
+                <div align="right">
+                    Change Record Request Submitted
+                    <apex:outputField label="Change Record Request Submitted" value="{!oProject.MPOT_NRO_Change_Record_Request_Indicator__c}" />
+                    <br/> Change Project Request Approved
+                    <apex:outputField label="Change Project Request Approved" value="{!oProject.MPOT_NRO_CR_Approved_Indicator__c}" />
+                    <br/> Submission Date:
+                    <apex:outputField label="Submission Date" value="{!oProject.MPOT_Submission_Date__c}" />
+                    
+                </div>
+            </apex:outputPanel>
+            <div align="center">
+                <apex:Messages id="msg" style="color:Red;font-weight:bold;" rendered="{!!popup}"></apex:Messages>
+            </div>
+            <apex:outputPanel >
+                <div align="center">
+                    <apex:commandButton value="Submit Change Request" action="{!submitCR}" rendered="{!(bIsNRO && oProject.MPOT_NRO_Change_Record_Request_Indicator__c != true )}" styleClass="mpo-button" />
+                    <apex:commandButton value="Approve Change Request" action="{!approveCR}" rendered="{!(bIsAdmin)}" styleClass="mpo-button" />
+                    <apex:commandButton value="Delete Change Request" action="{!deleteCR}" onclick="return confirm('Are you sure you want to delete the Change Request?');" rendered="{!(bIsNRO && (oProject.MPOT_NRO_CR_Created_Indicator__c == true))}" styleClass="mpo-button" />
+                    <!--
+                    <apex:commandButton value="Approve Change Request" action="{!approveCR}" rendered="{!(bIsAdmin && (oProject.MPOT_NRO_Change_Record_Request_Indicator__c == true) && (oProject.MPOT_NRO_CR_Approved_Indicator__c != true))}"/>
+                    -->
+                    <apex:commandButton value="Edit Change Request" action="{!editCR}" rendered="{!((oProject.MPOT_NRO_CR_Approved_Indicator__c == false) && ( (bIsNRO && ((oProject.MPOT_NRO_CR_Created_Indicator__c == true) || (oProject.MPOT_NRO_Change_Record_Request_Indicator__c == true))) ||(bIsAdmin && (oProject.MPOT_NRO_Change_Record_Request_Indicator__c == true))) )}" styleClass="mpo-button" />
+
+                </div>
+            </apex:outputPanel>
+            <br/>
+
+            <apex:pageBlockSection columns="2" title="Current Basic Project Information">
+
+                <apex:outputField label="Project Name" value="{!oProject.Name}">
+                    <apex:outputLink value="/apex/MPOT_ViewProjectPage?Id={!oProject.Id}"></apex:outputLink>
+                </apex:outputField>
+                <apex:outputField label="Project #" value="{!oProject.MPOT_Project_Number__c}" />
+                <apex:outputField label="Description" value="{!oProject.MPOT_Project_Description__c}" />
+                <apex:outputField label="Scope" value="{!oProject.MPOT_Project_Scope__c}" />
+                <apex:outputField label="Project Owner" value="{!oProject.MPOT_Project_Owner__c}" />
+                <apex:outputField label="Project Driver" value="{!oProject.MPOT_Project_Driver__c}" />
+                <apex:outputField label="Project Sponsor" value="{!oProject.MPOT_Project_Sponsor__c}" />
+                <apex:outputField label="Stage" value="{!oProject.MPOT_Stage__c}" />
+                <apex:outputField label="Network Record Owner" value="{!oProject.OwnerId}" />
+                <apex:outputField label="Regulatory Submission and Approval Required" value="{!oProject.MPOT_Regulatory_Impact__c}" />
+
+                <!-- added by Manoj -->
+                <apex:outputField label="Anchor" value="{!oProject.MPOT_Anchor__c}" />
+                <apex:outputField label="Regulatory Impact Level" value="{!oProject.MPOT_Regulatory_Impact_Level__c}" />
+
+                <apex:outputField label="Network Initiating" value="{!oProject.MPOT_Network_Project_Initiated_from__c}" />
+                <apex:outputField label="Networks Impacted" value="{!oProject.MPOT_Networks_Project_Impacts__c}" />
+                <apex:outputField label="Drug Product/Platform Impacted" value="{!oProject.MPOT_Platforms__c}" />
+                <apex:outputField label="Sites Impacted" value="{!oProject.MPOT_Sites__c}" />
+                <apex:outputField label="Molecules Impacted" value="{!oProject.MPOT_Molecule_Name__c}" />
+            </apex:pageBlockSection>
+
+            <!--
+
+            <apex:pageBlockSection columns="2" title="Changes Requested">
+            <apex:outputField label="Changed Project Name" value="{!oProject.MPOT_Changed_Project_Name__c }"/>
+            <apex:outputField label="Project #" value="{!oProject.MPOT_Project_Number__c}"/>
+            <apex:outputField label="Changed Description" value="{!oProject.MPOT_Changed_Project_Description__c}"/>
+            <apex:outputField label="Changed Scope" value="{!oProject.MPOT_Changed_Project_Scope__c}"/>
+            <apex:outputField label="Changed Project Owner" value="{!oProject.MPOT_Changed_Project_Owner__c}"/>
+            <apex:outputField label="Changed Project Driver" value="{!oProject.MPOT_Changed_Project_Driver__c}"/>
+            <apex:outputField label="Changed Project Sponsor" value="{!oProject.MPOT_Changed_Project_Sponsor__c}"/>
+            <apex:outputField label="Changed Stage" value="{!oProject.MPOT_Changed_Stage__c}"/>
+
+            <apex:outputField label="Changed Network Initiating" value="{!oProject.MPOT_Changed_Netwrk_Proj_Initiated_from__c}"/>
+            <apex:outputField label="Change Regulatory Impact To" value="{!oProject.MPOT_Change_Regulatory_Impact_To__c}"/>
+            <apex:outputField label="Changed Drug Product/Platform Impacted" value="{!oProject.MPOT_Changed_Platforms__c}"/>
+            <apex:outputField label="Changed Networks Impacted" value="{!oProject.MPOT_Changed_Networks_Project_Impacts__c}"/>
+            <apex:outputField label="Changed Molecules Impacted" value="{!oProject.MPOT_Changed_Molecule_Name__c}"/>
+            <apex:outputField label="Changed Sites Impacted" value="{!oProject.MPOT_Changed_Sites__c}"/>
+
+            <apex:outputField label="NRO Comments" value="{!oProject.MPOT_Changed_NRO_Comments__c}"/>    
+            <apex:outputField label="Admin Comments" value="{!oProject.MPOT_Administrative_Comments__c}" rendered="{!bIsAdmin }" />       
+            </apex:pageBlockSection>
+            -->
+
+            <style type="text/css">
+                .highlight {
+                    background-color: Yellow;
+                }
+                
+                .default {}
+            </style>
+
+            <apex:pageBlockSection columns="2" title="Changes Requested">
+
+                <apex:outputText label="Changed Project Name" value="{!oProject.MPOT_Changed_Project_Name__c }" styleClass="{!IF(oProject.MPOT_Changed_Project_Name__c != oProject.Name,'highlight', 'default')}" />
+
+                <apex:outputText label="Project #" value="{!oProject.MPOT_Project_Number__c}" />
+                <apex:outputText label="Changed Description" value="{!oProject.MPOT_Changed_Project_Description__c}" styleClass="{!IF(oProject.MPOT_Changed_Project_Description__c != oProject.MPOT_Project_Description__c,'highlight', 'default')}" />
+
+                <apex:outputText label="Changed Scope" value="{!oProject.MPOT_Changed_Project_Scope__c}" styleClass="{!IF(oProject.MPOT_Changed_Project_Scope__c != oProject.MPOT_Project_Scope__c,'highlight', 'default')}" />
+                <apex:pageBlockSectionItem >
+
+                    <apex:outputLabel value="Changed Project Owner" />
+                    <apex:outputPanel styleClass="{!IF(oProject.MPOT_Changed_Project_Owner__c != oProject.MPOT_Project_Owner__c && oProject.MPOT_Changed_Project_Owner__c != null,'highlight', 'default')}">
+                        <apex:outputField label="Changed Project Owner" value="{!oProject.MPOT_Changed_Project_Owner__c}" />
+                        <apex:image width="18" height="18" rendered="{!IF(oProject.MPOT_Changed_Project_Owner__c != oProject.MPOT_Project_Owner__c && oProject.MPOT_Changed_Project_Owner__c == null ,true, false)}" value="{!$Resource.MPOT_RedBin}" />
+                    </apex:outputPanel>
+                </apex:pageBlockSectionItem>
+
+                <apex:outputText label="Changed Project Driver" value="{!oProject.MPOT_Changed_Project_Driver__c}" styleClass="{!IF(oProject.MPOT_Changed_Project_Driver__c != oProject.MPOT_Project_Driver__c,'highlight', 'default')}" />
+                <apex:outputText label="Changed Project Sponsor" value="{!oProject.MPOT_Changed_Project_Sponsor__c}" styleClass="{!IF(oProject.MPOT_Changed_Project_Sponsor__c != oProject.MPOT_Project_Sponsor__c,'highlight', 'default')}" />
+                <apex:outputText label="Changed Stage" value="{!oProject.MPOT_Changed_Stage__c}" styleClass="{!IF(oProject.MPOT_Changed_Stage__c != oProject.MPOT_Stage__c,'highlight', 'default')}" />
+
+                <apex:outputText label="Changed Anchor" value="{!oProject.MPOT_Changed_Anchor__c}" styleClass="{!IF(oProject.MPOT_Changed_Anchor__c!= oProject.MPOT_Anchor__c,'highlight', 'default')}" />
+                
+                <apex:pageBlockSectionItem >
+                    <apex:outputLabel value="Changed Regulatory Impact" />
+                    <apex:outputPanel >
+                        <apex:outputText label="Changed Regulatory Impact" value="{!oProject.MPOT_Change_Regulatory_Impact_To__c}" styleClass="{!IF(oProject.MPOT_Change_Regulatory_Impact_To__c != oProject.MPOT_Regulatory_Impact__c && oProject.MPOT_Change_Regulatory_Impact_To__c != null,'highlight', 'default')}" />
+                        <apex:image width="18" height="18" rendered="{!IF(oProject.MPOT_Regulatory_Impact__c != oProject.MPOT_Change_Regulatory_Impact_To__c && oProject.MPOT_Change_Regulatory_Impact_To__c == null ,true, false)}" value="{!$Resource.MPOT_RedBin}" />
+                    </apex:outputPanel>
+                </apex:pageBlockSectionItem>
+                
+                <apex:outputText label="Changed Network Initiating" value="{!oProject.MPOT_Changed_Netwrk_Proj_Initiated_from__c}" styleClass="{!IF(oProject.MPOT_Changed_Netwrk_Proj_Initiated_from__c != oProject.MPOT_Network_Project_Initiated_from__c,'highlight', 'default')}" />
+                
+                
+                <apex:pageBlockSectionItem >
+                    <apex:outputLabel value="Changed Regulatory Impact Level" />
+                    <apex:outputPanel >
+                        <apex:outputText label="Changed Regulatory Impact Level" value="{!oProject.MPOT_Changed_Regulatory_Impact_Level__c}" styleClass="{!IF(oProject.MPOT_Changed_Regulatory_Impact_Level__c != oProject.MPOT_Regulatory_Impact_Level__c && oProject.MPOT_Changed_Regulatory_Impact_Level__c != null,'highlight', 'default')}" />
+                        <apex:image width="18" height="18" rendered="{!IF(oProject.MPOT_Changed_Regulatory_Impact_Level__c != oProject.MPOT_Regulatory_Impact_Level__c && oProject.MPOT_Changed_Regulatory_Impact_Level__c == null,true, false)}" value="{!$Resource.MPOT_RedBin}" />
+                    </apex:outputPanel>
+                </apex:pageBlockSectionItem>
+                <!--   
+                <apex:outputText label="Changed Regulatory Impact" value="{!oProject.MPOT_Change_Regulatory_Impact_To__c}" styleClass="{!IF(oProject.MPOT_Change_Regulatory_Impact_To__c != oProject.MPOT_Regulatory_Impact__c,'highlight', 'default')}"/>
+                -->
+                
+
+                <!--
+                <apex:outputText label="Changed Drug Product/Platform Impacted" value="{!oProject.MPOT_Changed_Platforms__c}" styleClass="{!IF(oProject.MPOT_Changed_Platforms__c != oProject.MPOT_Platforms__c,'highlight', 'default')}"/>
+                -->
+
+                <apex:pageBlockSectionItem >
+                    <apex:outputLabel value="Changed Drug Product/Platform Impacted" />
+                    <apex:outputPanel >
+                        <apex:outputText label="Changed Drug Product/Platform Impacted" value="{!oProject.MPOT_Changed_Platforms__c}" styleClass="{!IF(oProject.MPOT_Changed_Platforms__c != oProject.MPOT_Platforms__c && oProject.MPOT_Changed_Platforms__c != null,'highlight', 'default')}" />
+
+                        <apex:image width="18" height="18" rendered="{!IF(oProject.MPOT_Changed_Platforms__c != oProject.MPOT_Platforms__c && oProject.MPOT_Changed_Platforms__c == null ,true, false)}" value="{!$Resource.MPOT_RedBin}" />
+                        <!--
+                        <apex:outputText rendered="{!IF(oProject.MPOT_Changed_Platforms__c != oProject.MPOT_Platforms__c && oProject.MPOT_Changed_Platforms__c == null ,true, false)}" value="<<deleted>>" style="color:Red"> </apex:outputText>
+                        -->
+                    </apex:outputPanel>
+                </apex:pageBlockSectionItem>
+
+                <apex:outputText label="Changed Networks Impacted" value="{!oProject.MPOT_Changed_Networks_Project_Impacts__c}" styleClass="{!IF(oProject.MPOT_Changed_Networks_Project_Impacts__c != oProject.MPOT_Networks_Project_Impacts__c,'highlight', 'default')}" />
+
+                <!--
+                <apex:outputText label="Changed Molecules Impacted" value="{!oProject.MPOT_Changed_Molecule_Name__c}" styleClass="{!IF(oProject.MPOT_Changed_Molecule_Name__c != oProject.MPOT_Molecule_Name__c,'highlight', 'default')}"/>
+                -->
+                <apex:pageBlockSectionItem >
+                    <apex:outputLabel value="Changed Molecules Impacted" />
+                    <apex:outputPanel >
+                        <apex:outputText label="Changed Molecules Impacted" value="{!oProject.MPOT_Changed_Molecule_Name__c}" styleClass="{!IF(oProject.MPOT_Changed_Molecule_Name__c != oProject.MPOT_Molecule_Name__c && oProject.MPOT_Changed_Molecule_Name__c != null,'highlight', 'default')}" />
+
+                        <apex:image width="18" height="18" rendered="{!IF(oProject.MPOT_Changed_Molecule_Name__c != oProject.MPOT_Molecule_Name__c && oProject.MPOT_Changed_Molecule_Name__c == null ,true, false)}" value="{!$Resource.MPOT_RedBin}" />
+                        <!--
+                        <apex:outputText rendered="{!IF(oProject.MPOT_Changed_Platforms__c != oProject.MPOT_Platforms__c && oProject.MPOT_Changed_Platforms__c == null ,true, false)}" value="<<deleted>>" style="color:Red"> </apex:outputText>
+                        -->
+                    </apex:outputPanel>
+                </apex:pageBlockSectionItem>
+
+                <apex:outputText label="Changed Sites Impacted" value="{!oProject.MPOT_Changed_Sites__c}" styleClass="{!IF(oProject.MPOT_Changed_Sites__c != oProject.MPOT_Sites__c,'highlight', 'default')}" />
+
+                <apex:outputText label="NRO Comments" value="{!oProject.MPOT_Changed_NRO_Comments__c}" />
+                <apex:outputText label="Admin Comments" value="{!oProject.MPOT_Administrative_Comments__c}" rendered="{!bIsAdmin }" />
+            </apex:pageBlockSection>
+            <apex:outputPanel >
+            <apex:outputText style="color:Navy Blue" value="= Changed"><font style="background-color:Yellow">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</font>&nbsp;</apex:outputText> &nbsp;
+            </apex:outputPanel>
+             <apex:outputPanel >
+            <apex:image url="{!$Resource.MPOT_RedBin}" style="height:15px;" />
+            <apex:outputText style="color:Red;" value="= Deleted"></apex:outputText>
+            </apex:outputPanel>
+        </apex:pageBlock>
+    </apex:form>
+
+    <apex:outputPanel >
+        <apex:pageBlock >
+
+            <apex:pageBlockSection columns="2" title="Project Stage and Gating Slides">
+                <!--<apex:outputField label="Gating Slide Exception" value="{!oProject.MPOT_Gating_Slide_Exception__c}" rendered="{!!bIsNRO}"/>
+                -->
+            </apex:pageBlockSection>
+
+            <apex:form >
+                <apex:pageBlockSection >
+                    <div align="center">
+                        <apex:commandButton value="New Project Gating Slide" action="{!newGatingSlide}" rendered="{!((bIsOwner && NOT(oProject.MPOT_NRO_CR_Created_Indicator__c)) || bIsNRO || bISAdmin )}" styleClass="mpo-button" />
+                    </div>
+                </apex:pageBlockSection>
+            </apex:form>
+            <div class="conditional-hideLinks">
+                <apex:relatedList title="Project Gating Slide Files" list="Project_Gating_Slide_Files_CR__r" pageSize="50" />
+            </div>
+            
+        </apex:pageBlock>
+
+    </apex:outputPanel>
+
+</apex:page>

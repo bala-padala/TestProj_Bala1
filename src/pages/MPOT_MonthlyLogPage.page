@@ -1,0 +1,9 @@
+<apex:page controller="MPOT_MonthlyLog" sidebar="false" tabStyle="GLBL_Project__c">
+    <apex:stylesheet value="{!URLFOR($Resource.MPOT_Resource,'/css/chosen.min.css')}"/>
+    <apex:stylesheet value="{!URLFOR($Resource.MPOT_Resource,'/css/bootstrap.min.css')}"/>
+
+    <apex:stylesheet value="{!URLFOR($Resource.MPOT_Resource,'/css/MPO_styles.css')}"/>
+    <c:MPOT_MonthlyLogListViewComponent listViewName="{!ListViewName}"/>
+   
+   
+</apex:page>
