@@ -12,6 +12,7 @@
                 <behavior>Required</behavior>
                 <field>Name</field>
             </layoutItems>
+			
             <layoutItems>
                 <behavior>Readonly</behavior>
                 <field>MPOT_Project_Number__c</field>
